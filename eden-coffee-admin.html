@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>EDEN Coffee — Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <script>
+      (function(){ try {
+        var t = window.localStorage.getItem("edenAdminTheme") || "system";
+        var dark = t === "dark" || (t !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      } catch(e){} })();
+    </script>
+    <style>
+      :root{
+        --cream:#F6F0E5; --sand:#E9DECC; --soft:#FFFDF8;
+        --forest:#173D2B; --forest-2:#1F4D37;
+        --espresso:#291A14; --roast:#68412C; --botanical:#78866B;
+        --gold:#C5A46D; --gold-deep:#A9853F;
+        --ink-soft:rgba(41,26,20,.72); --ink-faint:rgba(41,26,20,.52);
+        --line:rgba(41,26,20,.16); --line-strong:rgba(41,26,20,.32);
+        --paper:#FFFDF8; --paper-ink:#291A14;
+        --danger:#9C3226; --ok:#2E6B45;
+        --field:#FFFDF8;
+        --shadow:0 18px 50px rgba(41,26,20,.14);
+        --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+        --sans:"Jost",-apple-system,"Segoe UI",sans-serif;
+      }
+      :root[data-theme="dark"]{
+        color-scheme:dark;
+        --cream:#171310; --sand:#241C16; --soft:#201913;
+        --forest:#8FBF9F; --forest-2:#2C5A41;
+        --espresso:#F1E8D8; --roast:#D8B28C; --botanical:#A9BFA0;
+        --gold:#C5A46D; --gold-deep:#C5A46D;
+        --ink-soft:rgba(241,232,216,.74); --ink-faint:rgba(241,232,216,.5);
+        --line:rgba(241,232,216,.16); --line-strong:rgba(241,232,216,.34);
+        --paper:#FFFDF8; --paper-ink:#291A14;
+        --danger:#E08A7D; --ok:#8FBF9F;
+        --field:#241C16;
+        --shadow:0 18px 50px rgba(0,0,0,.5);
+      }
+      :root[data-theme="light"]{ color-scheme:light; }
+      [hidden]{ display:none !important; }
+      *{ box-sizing:border-box; }
+      html{ -webkit-text-size-adjust:100%; }
+      body{
+        margin:0; background:var(--cream); color:var(--espresso);
+        font-family:var(--sans); font-weight:400; line-height:1.55;
+        min-height:100vh;
+      }
+      button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]),textarea{ min-height:2.25rem; }
+      h1,h2,h3{ font-family:var(--serif); font-weight:600; line-height:1.15; margin:0; }
+      a{ color:var(--forest); }
+      :root[data-theme="dark"] a{ color:var(--gold); }
+      :focus-visible{ outline:2px solid var(--gold-deep); outline-offset:2px; }
+
+      /* ---------- Wordmark ---------- */
+      .wordmark{ font-family:var(--serif); font-weight:600; letter-spacing:.34em; text-transform:uppercase; }
+      .wordmark small{ display:block; font-size:.42em; letter-spacing:.58em; margin-top:.35em; color:var(--roast); }
+
+      /* ---------- Login ---------- */
+      #loginView{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem 1rem 3rem; }
+      .login-card{
+        width:100%; max-width:26.5rem; background:var(--soft);
+        border:1px solid var(--line); box-shadow:var(--shadow);
+        padding:2.6rem 2.2rem 2.2rem; text-align:center;
+      }
+      .login-card .wordmark{ font-size:2rem; }
+      .login-path{
+        margin:1.1rem 0 0; font-size:.78rem; letter-spacing:.22em; text-transform:uppercase; color:var(--ink-faint);
+      }
+      .login-rule{ width:3.2rem; height:1px; background:var(--gold); margin:1.4rem auto; }
+      .login-card h1{ font-size:1.65rem; }
+      .login-hint{ color:var(--ink-soft); font-size:.95rem; margin:.55rem 0 1.4rem; }
+      .login-form{ text-align:left; display:grid; gap:.9rem; }
+      .login-form label{ display:grid; gap:.35rem; font-size:.82rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); }
+      .login-form input{
+        font-family:var(--sans); font-size:1rem; letter-spacing:0; text-transform:none; color:var(--espresso);
+        background:var(--field); border:1px solid var(--line-strong); padding:.6rem .8rem; width:100%;
+      }
+      .form-error{ color:var(--danger); font-size:.92rem; margin:0; min-height:1.2em; }
+      .btn{
+        font-family:var(--sans); font-size:.95rem; font-weight:500; letter-spacing:.14em; text-transform:uppercase;
+        border:1px solid var(--forest); background:var(--forest); color:#F6F0E5;
+        padding:.7rem 1.3rem; cursor:pointer; min-height:2.9rem;
+      }
+      .btn:hover{ background:var(--forest-2); }
+      :root[data-theme="dark"] .btn{ color:#171310; }
+      :root[data-theme="dark"] .btn:hover{ background:#A9D3B6; }
+      .btn.secondary{ background:transparent; color:var(--forest); }
+      .btn.secondary:hover{ background:var(--sand); }
+      :root[data-theme="dark"] .btn.secondary{ color:var(--gold); border-color:var(--gold); }
+      :root[data-theme="dark"] .btn.secondary:hover{ background:var(--sand); }
+      .btn.small{ min-height:2.5rem; padding:.45rem .95rem; font-size:.85rem; }
+      .btn.danger{ background:transparent; border-color:var(--danger); color:var(--danger); }
+      .linklike{
+        background:none; border:none; color:var(--ink-soft); font-family:var(--sans); font-size:.9rem;
+        text-decoration:underline; text-underline-offset:3px; cursor:pointer; padding:.5rem; min-height:2.25rem;
+      }
+      .reset-box{ margin-top:1rem; border-top:1px solid var(--line); padding-top:1rem; text-align:left; }
+      .reset-box p{ font-size:.92rem; color:var(--ink-soft); margin:.2rem 0 .8rem; }
+      .reset-actions{ display:flex; gap:.6rem; flex-wrap:wrap; }
+
+      /* ---------- Dashboard shell ---------- */
+      #dashView{ min-height:100vh; display:flex; flex-direction:column; }
+      .adminbar{
+        display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+        padding:.9rem 1.4rem; border-bottom:1px solid var(--line); background:var(--soft);
+        position:sticky; top:0; z-index:5;
+      }
+      .adminbar .wordmark{ font-size:1.15rem; }
+      .adminbar .wordmark small{ display:inline; font-size:.62em; letter-spacing:.4em; margin:0 0 0 .9em; }
+      .adminbar-actions{ display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+      .admin-tag{ font-size:.75rem; letter-spacing:.24em; text-transform:uppercase; color:var(--gold-deep); border:1px solid var(--gold); padding:.28rem .6rem; }
+      .tabs{
+        display:flex; flex-wrap:wrap; gap:.4rem; padding:.9rem 1.4rem 0; max-width:76rem; width:100%; margin:0 auto;
+      }
+      .tab{
+        font-family:var(--sans); font-size:.92rem; font-weight:500; letter-spacing:.12em; text-transform:uppercase;
+        background:transparent; border:1px solid var(--line-strong); color:var(--ink-soft);
+        padding:.55rem 1.1rem; cursor:pointer; min-height:2.75rem;
+      }
+      .tab[aria-selected="true"]{ background:var(--forest); border-color:var(--forest); color:#F6F0E5; }
+      :root[data-theme="dark"] .tab[aria-selected="true"]{ color:#171310; }
+      .seg{ display:flex; flex-wrap:wrap; gap:.4rem; }
+      .seg-btn{
+        font-family:var(--sans); font-size:.9rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase;
+        background:transparent; border:1px solid var(--line-strong); color:var(--ink-soft);
+        padding:.55rem 1.05rem; cursor:pointer; min-height:2.75rem;
+      }
+      .seg-btn[aria-pressed="true"]{ background:var(--forest); border-color:var(--forest); color:#F6F0E5; }
+      :root[data-theme="dark"] .seg-btn[aria-pressed="true"]{ color:#171310; }
+      main{ width:100%; max-width:76rem; margin:0 auto; padding:1.6rem 1.4rem 4rem; flex:1; }
+      .panel[hidden]{ display:none; }
+      .panel-head{ margin-bottom:1.4rem; }
+      .panel-head h2{ font-size:2rem; }
+      .panel-head p{ color:var(--ink-soft); margin:.35rem 0 0; max-width:44rem; }
+
+      /* ---------- Cards & lists ---------- */
+      .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr)); gap:1.1rem; }
+      .card{ background:var(--soft); border:1px solid var(--line); padding:1.4rem 1.4rem 1.2rem; }
+      .card h3{ font-size:1.3rem; margin-bottom:.8rem; }
+      .status-list{ list-style:none; margin:0; padding:0; display:grid; gap:.65rem; }
+      .status-list li{ display:flex; gap:.6rem; align-items:baseline; font-size:.98rem; }
+      .dot{ width:.55rem; height:.55rem; border-radius:50%; background:var(--ok); flex:none; transform:translateY(-.05rem); }
+      .dot.pending{ background:var(--gold-deep); }
+      .status-list .sub{ color:var(--ink-faint); font-size:.88rem; display:block; }
+      .link-list{ list-style:none; margin:0; padding:0; display:grid; }
+      .link-list li{ border-top:1px solid var(--line); }
+      .link-list li:first-child{ border-top:none; }
+      .link-list a{
+        display:flex; justify-content:space-between; align-items:center; gap:1rem;
+        padding:.72rem .1rem; text-decoration:none; min-height:2.9rem; color:var(--espresso);
+      }
+      .link-list a:hover{ color:var(--forest); }
+      :root[data-theme="dark"] .link-list a:hover{ color:var(--gold); }
+      .link-list .lname{ font-weight:500; }
+      .link-list .lurl{ color:var(--ink-faint); font-size:.88rem; text-align:right; word-break:break-all; }
+      .link-list .arrow{ color:var(--gold-deep); flex:none; }
+      .plain-list{ list-style:none; margin:0; padding:0; display:grid; gap:.55rem; font-size:.98rem; }
+      .plain-list .sub{ color:var(--ink-faint); font-size:.88rem; display:block; }
+      .note{ font-size:.9rem; color:var(--ink-soft); border-left:2px solid var(--gold); padding:.2rem 0 .2rem .9rem; margin-top:1.1rem; }
+
+      /* ---------- Forms ---------- */
+      .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13.5rem),1fr)); gap:1rem; }
+      .field{ display:grid; gap:.35rem; }
+      .field.full{ grid-column:1 / -1; }
+      .field label{ font-size:.8rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); }
+      .field input,.field select,.field textarea{
+        font-family:var(--sans); font-size:1rem; color:var(--espresso);
+        background:var(--field); border:1px solid var(--line-strong); padding:.55rem .75rem; width:100%;
+      }
+      .field textarea{ min-height:5.5rem; resize:vertical; }
+      .field .hint{ font-size:.85rem; color:var(--ink-faint); }
+
+      /* ---------- Billing layout ---------- */
+      .tool-layout{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:1.6rem; align-items:start; }
+      @media (max-width:62rem){ .tool-layout{ grid-template-columns:1fr; } }
+      .tool-form{ background:var(--soft); border:1px solid var(--line); padding:1.4rem; display:grid; gap:1.2rem; }
+      .tool-form h3{ font-size:1.25rem; }
+      .items-table{ width:100%; border-collapse:collapse; }
+      .items-table th{ font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); text-align:left; padding:.4rem .4rem .4rem 0; border-bottom:1px solid var(--line-strong); }
+      .items-table td{ padding:.45rem .4rem .45rem 0; border-bottom:1px solid var(--line); vertical-align:top; }
+      .items-table input{ width:100%; font-family:var(--sans); font-size:.98rem; color:var(--espresso); background:var(--field); border:1px solid var(--line); padding:.45rem .55rem; }
+      .items-table .num{ text-align:right; }
+      .items-table td.num-cell{ text-align:right; font-variant-numeric:tabular-nums; padding-top:.8rem; white-space:nowrap; }
+      .row-remove{ background:none; border:1px solid var(--line-strong); color:var(--danger); width:2.25rem; height:2.25rem; cursor:pointer; font-size:1rem; line-height:1; }
+      .form-actions{ display:flex; gap:.6rem; flex-wrap:wrap; }
+      .session-wrap{ margin-top:2rem; }
+      .session-table{ width:100%; border-collapse:collapse; background:var(--soft); border:1px solid var(--line); }
+      .session-table th,.session-table td{ text-align:left; padding:.7rem .9rem; border-bottom:1px solid var(--line); font-size:.95rem; }
+      .session-table th{ font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); }
+      .session-table td.num,.session-table th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+      .empty-msg{ color:var(--ink-faint); font-size:.95rem; padding:1rem 0; }
+      @media (max-width:40rem){
+        .session-table thead{ display:none; }
+        .session-table tr{ display:block; padding:.6rem 0; border-bottom:1px solid var(--line); }
+        .session-table td{ display:flex; justify-content:space-between; gap:1rem; border-bottom:none; padding:.35rem .9rem; }
+        .session-table td::before{ content:attr(data-l); font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+      }
+
+      /* ---------- Paper (invoice / letterhead) ---------- */
+      .paper-scroll{ background:var(--sand); border:1px solid var(--line); padding:1rem; }
+      .paper{
+        background:var(--paper); color:var(--paper-ink); padding:2.2rem 2.2rem 1.8rem;
+        font-size:.92rem; line-height:1.5; box-shadow:0 8px 28px rgba(41,26,20,.12);
+      }
+      .paper .lh-head{ text-align:center; border-bottom:2px solid #173D2B; padding-bottom:1rem; }
+      .paper .lh-word{ font-family:var(--serif); font-weight:600; font-size:1.9rem; letter-spacing:.32em; text-transform:uppercase; color:#173D2B; }
+      .paper .lh-word small{ display:block; font-size:.4em; letter-spacing:.55em; color:#68412C; margin-top:.3em; }
+      .paper .lh-tag{ font-family:var(--serif); font-style:italic; font-size:1rem; color:#68412C; margin-top:.45rem; }
+      .paper .lh-contact{ font-size:.78rem; letter-spacing:.06em; color:rgba(41,26,20,.66); margin-top:.5rem; }
+      .paper .lh-foot{ border-top:1px solid rgba(41,26,20,.25); margin-top:1.6rem; padding-top:.7rem; font-size:.76rem; color:rgba(41,26,20,.6); display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+      .paper h4{ font-family:var(--serif); font-size:1.35rem; color:#173D2B; margin:1.3rem 0 .4rem; font-weight:600; }
+      .paper .doc-title{ text-align:center; letter-spacing:.3em; text-transform:uppercase; font-size:.85rem; color:#68412C; margin-top:1.2rem; }
+      .meta-grid{ display:flex; justify-content:space-between; gap:1.5rem; flex-wrap:wrap; margin-top:1.1rem; }
+      .meta-grid .blk{ min-width:10rem; }
+      .meta-grid .k{ font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:rgba(41,26,20,.55); }
+      .meta-grid .v{ font-weight:500; }
+      .paper table{ width:100%; border-collapse:collapse; margin-top:1.1rem; }
+      .paper th{ text-align:left; font-size:.74rem; letter-spacing:.12em; text-transform:uppercase; color:#68412C; border-bottom:1.5px solid #173D2B; padding:.45rem .5rem .45rem 0; }
+      .paper td{ padding:.5rem .5rem .5rem 0; border-bottom:1px solid rgba(41,26,20,.14); vertical-align:top; }
+      .paper .num{ text-align:right; font-variant-numeric:tabular-nums; }
+      .totals{ margin-left:auto; width:min(100%,17rem); margin-top:1rem; }
+      .totals .trow{ display:flex; justify-content:space-between; padding:.3rem 0; }
+      .totals .trow.grand{ border-top:1.5px solid #173D2B; margin-top:.4rem; padding-top:.55rem; font-weight:600; font-size:1.05rem; color:#173D2B; }
+      .words{ margin-top:1rem; font-style:italic; color:rgba(41,26,20,.75); }
+      .sign{ margin-top:2.2rem; text-align:right; }
+      .sign .sig-space{ height:2.6rem; }
+      .letter-body{ margin-top:1.2rem; white-space:pre-wrap; }
+      .letter-meta{ margin-top:1.2rem; display:grid; gap:.25rem; }
+      .paper-actions{ display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1rem; }
+      .toast{
+        position:fixed; left:50%; bottom:1.4rem; transform:translateX(-50%) translateY(1rem);
+        background:var(--forest); color:#F6F0E5; padding:.75rem 1.3rem; font-size:.95rem;
+        opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:20; max-width:92vw; text-align:center;
+      }
+      :root[data-theme="dark"] .toast{ color:#171310; }
+      .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+      @media (prefers-reduced-motion: reduce){ .toast{ transition:none; } }
+
+      .dash-foot{ border-top:1px solid var(--line); padding:1.1rem 1.4rem; text-align:center; color:var(--ink-faint); font-size:.88rem; }
+      .dash-foot a{ color:var(--ink-soft); }
+
+      @media print{
+        body{ background:#fff; }
+        #loginView,.adminbar,.tabs,.tool-form,.paper-actions,.session-wrap,.dash-foot,.panel-head,.toast{ display:none !important; }
+        main{ padding:0; max-width:none; }
+        .tool-layout{ display:block; }
+        .paper-scroll{ border:none; padding:0; background:#fff; }
+        .paper{ box-shadow:none; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- ================= LOGIN ================= -->
+    <section id="loginView">
+      <div class="login-card">
+        <div class="wordmark">Eden<small>Coffee</small></div>
+        <p class="login-path">edencoffee.in/admin</p>
+        <div class="login-rule"></div>
+        <h1 id="loginTitle">Admin sign in</h1>
+        <p class="login-hint" id="loginHint">Enter the admin password for this page.</p>
+        <form class="login-form" id="loginForm" autocomplete="off">
+          <label>Password
+            <input type="password" id="pwInput" autocomplete="current-password" />
+          </label>
+          <label id="pwConfirmWrap" hidden>Confirm password
+            <input type="password" id="pwConfirm" autocomplete="new-password" />
+          </label>
+          <p class="form-error" id="loginError" role="alert"></p>
+          <button class="btn" type="submit" id="loginBtn">Sign in</button>
+        </form>
+        <div id="resetArea">
+          <button class="linklike" id="resetToggle" type="button" hidden>Forgot or reset the password</button>
+          <div class="reset-box" id="resetBox" hidden>
+            <p>Resetting clears the password saved in this browser. You will then set a new one. This only affects this page's gate — the website itself stays controlled by your GitHub sign-in.</p>
+            <div class="reset-actions">
+              <button class="btn small danger" id="resetConfirm" type="button">Yes, reset password</button>
+              <button class="btn small secondary" id="resetCancel" type="button">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DASHBOARD ================= -->
+    <div id="dashView" hidden>
+      <header class="adminbar">
+        <div class="wordmark">Eden<small>Coffee</small></div>
+        <div class="adminbar-actions">
+          <span class="admin-tag">Admin</span>
+          <a class="btn small secondary" href="https://edencoffee.in" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;">View site</a>
+          <button class="btn small secondary" id="lockBtn" type="button">Lock</button>
+        </div>
+      </header>
+
+      <nav class="tabs" role="tablist" aria-label="Admin sections">
+        <button class="tab" role="tab" data-tab="overview" aria-selected="true" type="button">Overview</button>
+        <button class="tab" role="tab" data-tab="billing" aria-selected="false" type="button">Billing</button>
+        <button class="tab" role="tab" data-tab="letterhead" aria-selected="false" type="button">Letterhead</button>
+        <button class="tab" role="tab" data-tab="settings" aria-selected="false" type="button">Settings</button>
+      </nav>
+
+      <main>
+        <!-- ========== OVERVIEW ========== -->
+        <section class="panel" data-panel="overview">
+          <div class="panel-head">
+            <h2>Overview</h2>
+            <p>EDEN Coffee at a glance — the website, the mailboxes, and where everything is managed.</p>
+          </div>
+          <div class="grid">
+            <div class="card">
+              <h3>Website status</h3>
+              <ul class="status-list">
+                <li><span class="dot"></span><span>edencoffee.in is live<span class="sub">Coming Soon page — products and prices stay hidden until the brand launch; orders open at launch.</span></span></li>
+                <li><span class="dot"></span><span>Secure (HTTPS on)<span class="sub">Certificate valid to 9 Feb 2027; http redirects to https.</span></span></li>
+                <li><span class="dot pending"></span><span>www.edencoffee.in certificate<span class="sub">Still being issued — in the meantime www over http redirects to the secure main site.</span></span></li>
+                <li><span class="dot"></span><span>Launch list open<span class="sub" id="ovWaLine">Visitors join on WhatsApp: +252 657366648.</span></span></li>
+                <li><span class="dot"></span><span>Domain at GoDaddy<span class="sub">edencoffee.in — renews 11 Nov 2027.</span></span></li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Quick links</h3>
+              <ul class="link-list">
+                <li><a href="https://edencoffee.in" target="_blank" rel="noopener"><span class="lname">Live website</span><span class="lurl">edencoffee.in</span><span class="arrow">→</span></a></li>
+                <li><a href="https://github.com/persianenterprises/edencoffee-in" target="_blank" rel="noopener"><span class="lname">Website files (GitHub)</span><span class="lurl">github.com/persianenterprises/edencoffee-in</span><span class="arrow">→</span></a></li>
+                <li><a href="https://mail.zoho.com" target="_blank" rel="noopener"><span class="lname">Zoho Mail</span><span class="lurl">mail.zoho.com</span><span class="arrow">→</span></a></li>
+                <li><a href="https://www.instagram.com/edencoffeeindia/" target="_blank" rel="noopener"><span class="lname">Instagram</span><span class="lurl">@edencoffeeindia</span><span class="arrow">→</span></a></li>
+                <li><a href="https://wa.me/252657366648" target="_blank" rel="noopener" id="qlWa"><span class="lname">WhatsApp</span><span class="lurl" id="qlWaUrl">+252 657366648</span><span class="arrow">→</span></a></li>
+                <li><a href="mailto:hello@edencoffee.in" id="qlEmail"><span class="lname">Email</span><span class="lurl" id="qlEmailUrl">hello@edencoffee.in</span><span class="arrow">→</span></a></li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Mailboxes</h3>
+              <ul class="plain-list">
+                <li><strong>hello@edencoffee.in</strong><span class="sub">Super admin — sign in at Zoho Mail with the Persian Enterprises Google account.</span></li>
+                <li><strong>anandbabu@edencoffee.in</strong><span class="sub">Administrator.</span></li>
+                <li><strong>ajithbabu@edencoffee.in</strong><span class="sub">Team mailbox.</span></li>
+              </ul>
+              <p class="note">On the free Zoho plan, mail is read in the Zoho Mail app or at mail.zoho.com — it can't be added to the Gmail app, and forwarding to other inboxes is a paid feature.</p>
+            </div>
+            <div class="card">
+              <h3>Owner tools</h3>
+              <ul class="plain-list">
+                <li><strong>Billing</strong><span class="sub">Make a tax invoice on the EDEN letterhead and download it — use the Billing tab above.</span></li>
+                <li><strong>Letterhead</strong><span class="sub">Write a letter on the official letterhead, or download a blank one — use the Letterhead tab above.</span></li>
+              </ul>
+              <p class="note">This page is a simple gate for the owner's tools. Real control of the website stays with the GitHub repository, the GoDaddy domain, and the Zoho admin — those sign-ins are the actual keys.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== BILLING ========== -->
+        <section class="panel" data-panel="billing" hidden>
+          <div class="panel-head">
+            <h2>Billing</h2>
+            <p>Fill in the bill on the left — the invoice builds itself on the right, on EDEN letterhead. Download it to keep or send it.</p>
+          </div>
+          <div class="tool-layout">
+            <form class="tool-form" id="billForm" autocomplete="off">
+              <div>
+                <h3>Invoice details</h3>
+                <div class="form-grid" style="margin-top:.8rem;">
+                  <div class="field"><label for="invNo">Invoice no.</label><input id="invNo" value="EDEN-001" /></div>
+                  <div class="field"><label for="invDate">Date</label><input id="invDate" type="date" /></div>
+                  <div class="field full"><label for="invDue">Payment note</label><input id="invDue" value="Payment due on receipt" /></div>
+                </div>
+              </div>
+              <div>
+                <h3>Billed to</h3>
+                <div class="form-grid" style="margin-top:.8rem;">
+                  <div class="field full"><label for="custName">Customer name</label><input id="custName" placeholder="e.g. Cafe Mocha, Nellore" /></div>
+                  <div class="field full"><label for="custAddr">Address</label><textarea id="custAddr" style="min-height:3.6rem;" placeholder="Street, town, PIN"></textarea></div>
+                  <div class="field"><label for="custPhone">Phone</label><input id="custPhone" inputmode="tel" /></div>
+                  <div class="field"><label for="custGstin">Customer GSTIN (if any)</label><input id="custGstin" /></div>
+                </div>
+              </div>
+              <div>
+                <h3>Items</h3>
+                <table class="items-table" style="margin-top:.6rem;">
+                  <thead><tr><th style="width:44%;">Description</th><th class="num" style="width:15%;">Qty</th><th class="num" style="width:24%;">Rate ₹</th><th class="num">Amount</th><th></th></tr></thead>
+                  <tbody id="itemsBody"></tbody>
+                </table>
+                <div class="form-actions" style="margin-top:.8rem;">
+                  <button class="btn small secondary" id="addItemBtn" type="button">+ Add item</button>
+                </div>
+              </div>
+              <div>
+                <h3>Charges</h3>
+                <div class="form-grid" style="margin-top:.8rem;">
+                  <div class="field"><label for="discPct">Discount %</label><input id="discPct" type="number" min="0" max="100" step="0.5" value="0" inputmode="decimal" /></div>
+                  <div class="field"><label for="gstPct">GST %</label><input id="gstPct" type="number" min="0" max="40" step="0.5" value="0" inputmode="decimal" /><span class="hint">Set the rate that applies to this sale.</span></div>
+                </div>
+              </div>
+              <div>
+                <h3>From (EDEN Coffee)</h3>
+                <div class="form-grid" style="margin-top:.8rem;">
+                  <div class="field full"><label for="bizAddr">Business address</label><input id="bizAddr" value="Nellore, Andhra Pradesh, India" /></div>
+                  <div class="field"><label for="bizGstin">EDEN GSTIN</label><input id="bizGstin" placeholder="Add when available" /></div>
+                  <div class="field"><label for="bizPhone">Phone / WhatsApp</label><input id="bizPhone" value="+252 657366648" /></div>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button class="btn" id="saveInvoiceBtn" type="button">Add to this session's list</button>
+                <button class="btn secondary" id="newInvoiceBtn" type="button">New invoice</button>
+              </div>
+            </form>
+
+            <div>
+              <div class="paper-scroll">
+                <div class="paper" id="invoicePaper"></div>
+              </div>
+              <div class="paper-actions">
+                <button class="btn" id="dlInvoiceBtn" type="button">Download invoice</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="session-wrap">
+            <h3 style="font-family:var(--serif);font-size:1.35rem;">Invoices made this session</h3>
+            <p class="empty-msg" id="sessionEmpty">None yet. Invoices live in this session only — download each one to keep it.</p>
+            <table class="session-table" id="sessionTable" hidden>
+              <thead><tr><th>Invoice</th><th>Date</th><th>Billed to</th><th class="num">Total</th><th></th></tr></thead>
+              <tbody id="sessionBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========== LETTERHEAD ========== -->
+        <section class="panel" data-panel="letterhead" hidden>
+          <div class="panel-head">
+            <h2>Letterhead</h2>
+            <p>The official EDEN Coffee letterhead. Write a letter and download it ready to send or print — or download the blank letterhead on its own.</p>
+          </div>
+          <div class="tool-layout">
+            <form class="tool-form" id="letterForm" autocomplete="off">
+              <div class="form-grid">
+                <div class="field"><label for="letDate">Date</label><input id="letDate" type="date" /></div>
+                <div class="field"><label for="letRef">Reference (optional)</label><input id="letRef" placeholder="e.g. EDEN/2026/14" /></div>
+                <div class="field full"><label for="letTo">To</label><textarea id="letTo" style="min-height:3.6rem;" placeholder="Name and address of the person or company"></textarea></div>
+                <div class="field full"><label for="letSubject">Subject</label><input id="letSubject" placeholder="What this letter is about" /></div>
+                <div class="field full"><label for="letBody">Letter</label><textarea id="letBody" style="min-height:11rem;" placeholder="Dear …"></textarea></div>
+                <div class="field full"><label for="letSign">Signed by</label><input id="letSign" value="For EDEN Coffee" /></div>
+              </div>
+              <div class="form-actions">
+                <button class="btn secondary" id="clearLetterBtn" type="button">Clear letter</button>
+              </div>
+            </form>
+            <div>
+              <div class="paper-scroll">
+                <div class="paper" id="letterPaper"></div>
+              </div>
+              <div class="paper-actions">
+                <button class="btn" id="dlLetterBtn" type="button">Download letter</button>
+                <button class="btn secondary" id="dlBlankBtn" type="button">Download blank letterhead</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== SETTINGS ========== -->
+        <section class="panel" data-panel="settings" hidden>
+          <div class="panel-head">
+            <h2>Settings</h2>
+            <p>Business details, appearance and the admin password — everything here is saved in this browser only.</p>
+          </div>
+          <div class="grid">
+            <div class="card">
+              <h3>Appearance</h3>
+              <p style="color:var(--ink-soft);font-size:.95rem;margin:.2rem 0 1rem;">Choose how this admin page looks. System follows your device's own light or dark setting.</p>
+              <div class="seg" role="group" aria-label="Theme">
+                <button type="button" class="seg-btn" data-theme-opt="light" aria-pressed="false">Light</button>
+                <button type="button" class="seg-btn" data-theme-opt="dark" aria-pressed="false">Dark</button>
+                <button type="button" class="seg-btn" data-theme-opt="system" aria-pressed="false">System</button>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Business details</h3>
+              <p style="color:var(--ink-soft);font-size:.95rem;margin:.2rem 0 1rem;">Used on every invoice and letter, and filled into the Billing form for you.</p>
+              <form class="login-form" id="bizForm" autocomplete="off" style="margin-top:.4rem;">
+                <label>Business address<input type="text" id="setAddr" /></label>
+                <label>Contact email<input type="email" id="setEmail" /></label>
+                <label>Phone / WhatsApp<input type="text" id="setPhone" inputmode="tel" /></label>
+                <label>EDEN GSTIN<input type="text" id="setGstin" placeholder="Add when available" /></label>
+                <label>Default GST %<input type="number" id="setGstPct" min="0" max="40" step="0.5" inputmode="decimal" /></label>
+                <label>Default payment note<input type="text" id="setPayNote" /></label>
+                <label>Invoice number prefix<input type="text" id="setInvPrefix" /></label>
+                <button class="btn" type="submit">Save details</button>
+              </form>
+            </div>
+            <div class="card">
+              <h3>Change password</h3>
+              <form class="login-form" id="changePwForm" autocomplete="off" style="margin-top:.4rem;">
+                <label>Current password<input type="password" id="curPw" autocomplete="current-password" /></label>
+                <label>New password<input type="password" id="newPw" autocomplete="new-password" /></label>
+                <label>Confirm new password<input type="password" id="newPw2" autocomplete="new-password" /></label>
+                <p class="form-error" id="changeError" role="alert"></p>
+                <button class="btn" type="submit">Update password</button>
+              </form>
+            </div>
+            <div class="card">
+              <h3>About this gate</h3>
+              <ul class="plain-list">
+                <li>The password never leaves this browser — only a scrambled fingerprint of it is kept here, never the password itself.</li>
+                <li>Anyone with the website's code could get past a gate like this, so treat it as a lock on a diary, not a safe. The real security is your GitHub, GoDaddy and Zoho sign-ins — keep those strong and private.</li>
+                <li>Forgotten it? Use “Forgot or reset the password” on the sign-in screen to set a new one in this browser.</li>
+              </ul>
+              <div class="form-actions" style="margin-top:1.1rem;">
+                <button class="btn secondary" id="lockBtn2" type="button">Lock this page</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="dash-foot">
+        EDEN Coffee · Admin — this page will sit at <strong>edencoffee.in/admin</strong>. Developed and designed by <a href="https://www.instagram.com/fidelcastro____?srtk=bjdyOGdlcHo1ejg5" target="_blank" rel="noopener">Fidel Castro</a>.
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+    (function(){
+      "use strict";
+      var $ = function(id){ return document.getElementById(id); };
+      var store = {
+        get: function(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } },
+        set: function(k,v){ try { window.localStorage.setItem(k,v); } catch(e){} },
+        del: function(k){ try { window.localStorage.removeItem(k); } catch(e){} }
+      };
+      var PW_KEY = "edenAdminPwHash";
+      var THEME_KEY = "edenAdminTheme";
+      var BIZ_KEY = "edenAdminBiz";
+      var BIZ_DEFAULTS = {
+        addr: "Nellore, Andhra Pradesh, India",
+        email: "hello@edencoffee.in",
+        phone: "+252 657366648",
+        gstin: "",
+        gstPct: 0,
+        payNote: "Payment due on receipt",
+        invPrefix: "EDEN-"
+      };
+      function loadBiz(){
+        var b = null;
+        try { b = JSON.parse(store.get(BIZ_KEY) || "null"); } catch(e){ b = null; }
+        var out = {}, k;
+        for (k in BIZ_DEFAULTS) out[k] = (b && typeof b[k] !== "undefined") ? b[k] : BIZ_DEFAULTS[k];
+        return out;
+      }
+      var biz = loadBiz();
+
+      /* ---------- appearance (theme) ---------- */
+      var mqDark = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+      function themePref(){ return store.get(THEME_KEY) || "system"; }
+      function applyTheme(){
+        var pref = themePref();
+        var dark = pref === "dark" || (pref !== "light" && !!(mqDark && mqDark.matches));
+        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+        Array.prototype.forEach.call(document.querySelectorAll("[data-theme-opt]"), function(btn){
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-theme-opt") === pref ? "true" : "false");
+        });
+      }
+      Array.prototype.forEach.call(document.querySelectorAll("[data-theme-opt]"), function(btn){
+        btn.addEventListener("click", function(){
+          store.set(THEME_KEY, btn.getAttribute("data-theme-opt"));
+          applyTheme();
+          toast("Appearance set to " + btn.textContent.trim() + ".");
+        });
+      });
+      if (mqDark && mqDark.addEventListener){
+        mqDark.addEventListener("change", function(){ if (themePref() === "system") applyTheme(); });
+      }
+
+      /* ---------- business details ---------- */
+      function applyBiz(initial){
+        $("setAddr").value = biz.addr;
+        $("setEmail").value = biz.email;
+        $("setPhone").value = biz.phone;
+        $("setGstin").value = biz.gstin;
+        $("setGstPct").value = biz.gstPct;
+        $("setPayNote").value = biz.payNote;
+        $("setInvPrefix").value = biz.invPrefix;
+        $("bizAddr").value = biz.addr;
+        $("bizGstin").value = biz.gstin;
+        $("bizPhone").value = biz.phone;
+        $("gstPct").value = biz.gstPct;
+        $("invDue").value = biz.payNote;
+        if (initial) $("invNo").value = (biz.invPrefix || "EDEN-") + "001";
+        var digits = String(biz.phone).replace(/\D/g, "");
+        $("ovWaLine").textContent = "Visitors join on WhatsApp: " + biz.phone + ".";
+        $("qlWa").href = "https://wa.me/" + digits;
+        $("qlWaUrl").textContent = biz.phone;
+        $("qlEmail").href = "mailto:" + biz.email;
+        $("qlEmailUrl").textContent = biz.email;
+      }
+      $("bizForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        biz = {
+          addr: $("setAddr").value.trim() || BIZ_DEFAULTS.addr,
+          email: $("setEmail").value.trim() || BIZ_DEFAULTS.email,
+          phone: $("setPhone").value.trim() || BIZ_DEFAULTS.phone,
+          gstin: $("setGstin").value.trim(),
+          gstPct: Math.max(0, parseFloat($("setGstPct").value) || 0),
+          payNote: $("setPayNote").value.trim(),
+          invPrefix: $("setInvPrefix").value.trim() || BIZ_DEFAULTS.invPrefix
+        };
+        store.set(BIZ_KEY, JSON.stringify(biz));
+        applyBiz(false);
+        renderInvoice();
+        renderLetter();
+        toast("Business details saved.");
+      });
+      var toastTimer = null;
+      function toast(msg){
+        var t = $("toast"); t.textContent = msg; t.classList.add("show");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 3200);
+      }
+      function esc(s){
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+          return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+        });
+      }
+      function nl2br(s){ return esc(s).replace(/\n/g,"<br>"); }
+
+      /* ---------- password hashing ---------- */
+      function fallbackHash(str){
+        var h1 = 0xdeadbeef, h2 = 0x41c6ce57, i, ch;
+        for (i = 0; i < str.length; i++){
+          ch = str.charCodeAt(i);
+          h1 = Math.imul(h1 ^ ch, 2654435761);
+          h2 = Math.imul(h2 ^ ch, 1597334677);
+        }
+        h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+        h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+        return "x" + (h2 >>> 0).toString(16) + (h1 >>> 0).toString(16);
+      }
+      function hashPw(pw){
+        var salted = "eden-admin::" + pw;
+        if (window.crypto && window.crypto.subtle && window.isSecureContext){
+          return window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(salted)).then(function(buf){
+            var bytes = new Uint8Array(buf), hex = "";
+            for (var i = 0; i < bytes.length; i++) hex += ("0" + bytes[i].toString(16)).slice(-2);
+            return "s" + hex;
+          }).catch(function(){ return fallbackHash(salted); });
+        }
+        return Promise.resolve(fallbackHash(salted));
+      }
+
+      /* ---------- login ---------- */
+      var loginView = $("loginView"), dashView = $("dashView");
+      function isSetup(){ return !store.get(PW_KEY); }
+      function paintLogin(){
+        var setup = isSetup();
+        $("loginTitle").textContent = setup ? "Set your admin password" : "Admin sign in";
+        $("loginHint").textContent = setup
+          ? "First time here: choose the password for this page. It is kept only in this browser — nothing is sent anywhere."
+          : "Enter the admin password for this page.";
+        $("loginBtn").textContent = setup ? "Set password & enter" : "Sign in";
+        $("pwConfirmWrap").hidden = !setup;
+        $("resetToggle").hidden = setup;
+        $("resetBox").hidden = true;
+        $("loginError").textContent = "";
+        $("pwInput").value = ""; $("pwConfirm").value = "";
+      }
+      function unlock(){
+        loginView.hidden = true; dashView.hidden = false;
+        window.scrollTo(0,0);
+      }
+      function lock(){
+        dashView.hidden = true; loginView.hidden = false;
+        paintLogin();
+        window.scrollTo(0,0);
+      }
+      $("loginForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var pw = $("pwInput").value, err = $("loginError");
+        if (isSetup()){
+          if (pw.length < 6){ err.textContent = "Use at least 6 characters."; return; }
+          if (pw !== $("pwConfirm").value){ err.textContent = "The two passwords don't match."; return; }
+          hashPw(pw).then(function(h){
+            store.set(PW_KEY, h);
+            toast("Password set. Welcome to EDEN Coffee Admin.");
+            unlock();
+          });
+        } else {
+          hashPw(pw).then(function(h){
+            if (h === store.get(PW_KEY)){ err.textContent = ""; unlock(); }
+            else { err.textContent = "That password doesn't match. Try again."; }
+          });
+        }
+      });
+      $("resetToggle").addEventListener("click", function(){ $("resetBox").hidden = !$("resetBox").hidden; });
+      $("resetCancel").addEventListener("click", function(){ $("resetBox").hidden = true; });
+      $("resetConfirm").addEventListener("click", function(){
+        store.del(PW_KEY); paintLogin();
+        toast("Password cleared. Set a new one to continue.");
+      });
+      $("lockBtn").addEventListener("click", lock);
+      $("lockBtn2").addEventListener("click", lock);
+
+      /* ---------- change password ---------- */
+      $("changePwForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var err = $("changeError"), cur = $("curPw").value, nw = $("newPw").value;
+        hashPw(cur).then(function(h){
+          if (h !== store.get(PW_KEY)){ err.textContent = "Current password doesn't match."; return; }
+          if (nw.length < 6){ err.textContent = "New password needs at least 6 characters."; return; }
+          if (nw !== $("newPw2").value){ err.textContent = "The new passwords don't match."; return; }
+          hashPw(nw).then(function(h2){
+            store.set(PW_KEY, h2);
+            err.textContent = "";
+            $("curPw").value = $("newPw").value = $("newPw2").value = "";
+            toast("Password updated.");
+          });
+        });
+      });
+
+      /* ---------- tabs ---------- */
+      var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+      var panels = Array.prototype.slice.call(document.querySelectorAll(".panel"));
+      tabs.forEach(function(tab){
+        tab.addEventListener("click", function(){
+          tabs.forEach(function(t){ t.setAttribute("aria-selected", t === tab ? "true" : "false"); });
+          panels.forEach(function(p){ p.hidden = p.getAttribute("data-panel") !== tab.getAttribute("data-tab"); });
+          window.scrollTo(0,0);
+        });
+      });
+
+      /* ---------- shared doc helpers ---------- */
+      var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      function fmtDate(iso){
+        if (!iso) return "";
+        var p = iso.split("-");
+        if (p.length !== 3) return iso;
+        return parseInt(p[2],10) + " " + (MONTHS[parseInt(p[1],10)-1] || "") + " " + p[0];
+      }
+      function todayISO(){
+        var d = new Date();
+        return d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0"+d.getDate()).slice(-2);
+      }
+      function money(n){
+        return "₹" + (Math.round(n * 100) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      var ONES = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+      var TENS = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+      function twoDigits(n){
+        if (n < 20) return ONES[n];
+        var t = Math.floor(n/10), r = n % 10;
+        return TENS[t] + (r ? " " + ONES[r] : "");
+      }
+      function threeDigits(n){
+        var h = Math.floor(n/100), r = n % 100;
+        return (h ? ONES[h] + " Hundred" + (r ? " " : "") : "") + (r ? twoDigits(r) : "");
+      }
+      function inWords(num){
+        num = Math.floor(Math.abs(num));
+        if (num === 0) return "Zero";
+        var parts = [];
+        var crore = Math.floor(num / 10000000); num %= 10000000;
+        var lakh = Math.floor(num / 100000); num %= 100000;
+        var thou = Math.floor(num / 1000); num %= 1000;
+        if (crore) parts.push(twoDigits(crore) + " Crore");
+        if (lakh) parts.push(twoDigits(lakh) + " Lakh");
+        if (thou) parts.push(twoDigits(thou) + " Thousand");
+        if (num) parts.push(threeDigits(num));
+        return parts.join(" ");
+      }
+      function download(filename, html){
+        var blob = new Blob([html], { type: "text/html;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+      }
+      var DOC_CSS = [
+        "body{font-family:Georgia,'Times New Roman',serif;color:#291A14;margin:0;padding:24px;background:#fff;}",
+        ".sheet{max-width:760px;margin:0 auto;}",
+        ".lh-head{text-align:center;border-bottom:2px solid #173D2B;padding-bottom:14px;}",
+        ".lh-word{font-size:30px;letter-spacing:.32em;text-transform:uppercase;color:#173D2B;font-weight:600;}",
+        ".lh-word small{display:block;font-size:12px;letter-spacing:.55em;color:#68412C;margin-top:4px;}",
+        ".lh-tag{font-style:italic;color:#68412C;margin-top:6px;}",
+        ".lh-contact{font-family:Arial,sans-serif;font-size:11.5px;color:rgba(41,26,20,.66);margin-top:6px;}",
+        ".lh-foot{border-top:1px solid rgba(41,26,20,.25);margin-top:26px;padding-top:9px;font-family:Arial,sans-serif;font-size:11px;color:rgba(41,26,20,.6);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;}",
+        ".doc-title{text-align:center;letter-spacing:.3em;text-transform:uppercase;font-size:13px;color:#68412C;margin-top:18px;font-family:Arial,sans-serif;}",
+        "h4{font-size:20px;color:#173D2B;margin:20px 0 5px;}",
+        ".meta{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-top:16px;font-family:Arial,sans-serif;font-size:13.5px;}",
+        ".k{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(41,26,20,.55);}",
+        "table{width:100%;border-collapse:collapse;margin-top:16px;font-family:Arial,sans-serif;font-size:13.5px;}",
+        "th{text-align:left;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#68412C;border-bottom:1.5px solid #173D2B;padding:6px 8px 6px 0;}",
+        "td{padding:7px 8px 7px 0;border-bottom:1px solid rgba(41,26,20,.14);vertical-align:top;}",
+        ".num{text-align:right;}",
+        ".totals{margin-left:auto;width:270px;margin-top:14px;font-family:Arial,sans-serif;font-size:13.5px;}",
+        ".trow{display:flex;justify-content:space-between;padding:3px 0;}",
+        ".grand{border-top:1.5px solid #173D2B;margin-top:5px;padding-top:8px;font-weight:bold;font-size:15.5px;color:#173D2B;}",
+        ".words{margin-top:14px;font-style:italic;color:rgba(41,26,20,.75);font-size:13.5px;}",
+        ".sign{margin-top:44px;text-align:right;font-family:Arial,sans-serif;font-size:13.5px;}",
+        ".sign .sig-space{height:42px;}",
+        ".letter-meta{margin-top:18px;font-family:Arial,sans-serif;font-size:13.5px;line-height:1.7;}",
+        ".letter-body{margin-top:16px;white-space:pre-wrap;font-size:15px;line-height:1.65;}",
+        "@media print{body{padding:0;}}"
+      ].join("\n");
+      function letterheadTop(){
+        return '<div class="lh-head"><div class="lh-word">Eden<small>Coffee</small></div>' +
+          '<div class="lh-tag">Where conversations brew</div>' +
+          '<div class="lh-contact">' + esc(biz.addr) + ' &nbsp;·&nbsp; ' + esc(biz.email) + ' &nbsp;·&nbsp; edencoffee.in &nbsp;·&nbsp; ' + esc(biz.phone) + '</div></div>';
+      }
+      function letterheadFoot(){
+        return '<div class="lh-foot"><span>EDEN Coffee · edencoffee.in</span><span>hello@edencoffee.in</span><span>Instagram @edencoffeeindia</span></div>';
+      }
+      function docShell(title, inner){
+        return '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>' + esc(title) +
+          '</title><style>' + DOC_CSS + '</style></head><body><div class="sheet">' + inner + '</div></body></html>';
+      }
+
+      /* ================= BILLING ================= */
+      var itemsBody = $("itemsBody");
+      function addItemRow(desc, qty, rate){
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          '<td><input class="it-desc" value="' + esc(desc || "") + '" placeholder="e.g. EDEN Signature Blend 250g"></td>' +
+          '<td><input class="it-qty num" type="number" min="0" step="any" value="' + esc(qty == null ? 1 : qty) + '" inputmode="decimal"></td>' +
+          '<td><input class="it-rate num" type="number" min="0" step="any" value="' + esc(rate == null ? "" : rate) + '" placeholder="0" inputmode="decimal"></td>' +
+          '<td class="num-cell it-amt">₹0.00</td>' +
+          '<td><button type="button" class="row-remove" aria-label="Remove item">×</button></td>';
+        itemsBody.appendChild(tr);
+        tr.querySelector(".row-remove").addEventListener("click", function(){
+          tr.parentNode.removeChild(tr);
+          if (!itemsBody.children.length) addItemRow("", 1, "");
+          renderInvoice();
+        });
+        Array.prototype.forEach.call(tr.querySelectorAll("input"), function(inp){
+          inp.addEventListener("input", renderInvoice);
+        });
+      }
+      function collectInvoice(){
+        var items = [];
+        Array.prototype.forEach.call(itemsBody.children, function(tr){
+          var desc = tr.querySelector(".it-desc").value.trim();
+          var qty = parseFloat(tr.querySelector(".it-qty").value) || 0;
+          var rate = parseFloat(tr.querySelector(".it-rate").value) || 0;
+          var amtCell = tr.querySelector(".it-amt");
+          if (amtCell) amtCell.textContent = money(qty * rate);
+          items.push({ desc: desc, qty: qty, rate: rate, amount: qty * rate });
+        });
+        var subtotal = items.reduce(function(s,i){ return s + i.amount; }, 0);
+        var discPct = Math.min(100, Math.max(0, parseFloat($("discPct").value) || 0));
+        var gstPct = Math.max(0, parseFloat($("gstPct").value) || 0);
+        var discount = subtotal * discPct / 100;
+        var taxable = subtotal - discount;
+        var gst = taxable * gstPct / 100;
+        var total = Math.round(taxable + gst);
+        return {
+          no: $("invNo").value.trim() || "EDEN-001",
+          date: $("invDate").value,
+          due: $("invDue").value.trim(),
+          custName: $("custName").value.trim(),
+          custAddr: $("custAddr").value.trim(),
+          custPhone: $("custPhone").value.trim(),
+          custGstin: $("custGstin").value.trim(),
+          bizAddr: $("bizAddr").value.trim(),
+          bizGstin: $("bizGstin").value.trim(),
+          bizPhone: $("bizPhone").value.trim(),
+          items: items, subtotal: subtotal, discPct: discPct, discount: discount,
+          gstPct: gstPct, gst: gst, total: total
+        };
+      }
+      function invoiceHTML(d){
+        var rows = d.items.filter(function(i){ return i.desc || i.amount; }).map(function(i, idx){
+          return "<tr><td>" + (idx+1) + "</td><td>" + esc(i.desc || "—") + '</td><td class="num">' + i.qty +
+            '</td><td class="num">' + money(i.rate) + '</td><td class="num">' + money(i.amount) + "</td></tr>";
+        }).join("");
+        if (!rows) rows = '<tr><td colspan="5" style="color:rgba(41,26,20,.5);">No items yet</td></tr>';
+        var custLines = [];
+        if (d.custName) custLines.push("<strong>" + esc(d.custName) + "</strong>");
+        if (d.custAddr) custLines.push(nl2br(d.custAddr));
+        if (d.custPhone) custLines.push(esc(d.custPhone));
+        if (d.custGstin) custLines.push("GSTIN: " + esc(d.custGstin));
+        var tot =
+          '<div class="totals">' +
+          '<div class="trow"><span>Subtotal</span><span>' + money(d.subtotal) + "</span></div>" +
+          (d.discPct ? '<div class="trow"><span>Discount (' + d.discPct + '%)</span><span>− ' + money(d.discount) + "</span></div>" : "") +
+          (d.gstPct ? '<div class="trow"><span>GST (' + d.gstPct + '%)</span><span>' + money(d.gst) + "</span></div>" : "") +
+          '<div class="trow grand"><span>Total</span><span>' + money(d.total) + "</span></div></div>";
+        return letterheadTop() +
+          '<div class="doc-title">Tax Invoice</div>' +
+          '<div class="meta-grid meta"><div class="blk"><div class="k">Invoice no.</div><div class="v">' + esc(d.no) + "</div>" +
+          '<div class="k" style="margin-top:.5rem;">Date</div><div class="v">' + esc(fmtDate(d.date)) + "</div>" +
+          (d.due ? '<div class="k" style="margin-top:.5rem;">Payment</div><div class="v">' + esc(d.due) + "</div>" : "") + "</div>" +
+          '<div class="blk"><div class="k">Billed to</div><div class="v">' + (custLines.length ? custLines.join("<br>") : '<span style="color:rgba(41,26,20,.5);">Customer details</span>') + "</div></div>" +
+          '<div class="blk"><div class="k">From</div><div class="v"><strong>EDEN Coffee</strong><br>' + esc(d.bizAddr) + "<br>" + esc(biz.email) +
+          (d.bizPhone ? "<br>" + esc(d.bizPhone) : "") + (d.bizGstin ? "<br>GSTIN: " + esc(d.bizGstin) : "") + "</div></div></div>" +
+          "<table><thead><tr><th>#</th><th>Description</th><th class=\"num\">Qty</th><th class=\"num\">Rate</th><th class=\"num\">Amount</th></tr></thead><tbody>" + rows + "</tbody></table>" +
+          tot +
+          '<p class="words">Amount in words: Rupees ' + inWords(d.total) + " Only</p>" +
+          '<div class="sign"><div class="sig-space"></div>For EDEN Coffee<br><span style="color:rgba(41,26,20,.55);font-size:.8rem;">Authorised signatory</span></div>' +
+          letterheadFoot();
+      }
+      function renderInvoice(){
+        $("invoicePaper").innerHTML = invoiceHTML(collectInvoice());
+      }
+      ["invNo","invDate","invDue","custName","custAddr","custPhone","custGstin","bizAddr","bizGstin","bizPhone","discPct","gstPct"].forEach(function(id){
+        $(id).addEventListener("input", renderInvoice);
+      });
+      $("addItemBtn").addEventListener("click", function(){ addItemRow("", 1, ""); renderInvoice(); });
+      $("dlInvoiceBtn").addEventListener("click", function(){
+        var d = collectInvoice();
+        download("EDEN-Invoice-" + d.no.replace(/[^\w\-]+/g, "-") + ".html", docShell("EDEN Coffee — Invoice " + d.no, invoiceHTML(d)));
+        toast("Invoice downloaded. Open it to print or send it.");
+      });
+      /* session list */
+      var sessionInvoices = [];
+      function renderSession(){
+        var tb = $("sessionBody");
+        tb.innerHTML = "";
+        $("sessionEmpty").hidden = sessionInvoices.length > 0;
+        $("sessionTable").hidden = sessionInvoices.length === 0;
+        sessionInvoices.forEach(function(d, i){
+          var tr = document.createElement("tr");
+          tr.innerHTML = '<td data-l="Invoice">' + esc(d.no) + '</td><td data-l="Date">' + esc(fmtDate(d.date)) +
+            '</td><td data-l="Billed to">' + esc(d.custName || "—") + '</td><td data-l="Total" class="num">' + money(d.total) +
+            '</td><td data-l=""><button type="button" class="btn small secondary">Download</button></td>';
+          tr.querySelector("button").addEventListener("click", function(){
+            download("EDEN-Invoice-" + d.no.replace(/[^\w\-]+/g, "-") + ".html", docShell("EDEN Coffee — Invoice " + d.no, invoiceHTML(d)));
+          });
+          tb.appendChild(tr);
+        });
+      }
+      function bumpInvoiceNo(){
+        var v = $("invNo").value;
+        var m = v.match(/^(.*?)(\d+)\s*$/);
+        if (m){
+          var next = String(parseInt(m[2], 10) + 1);
+          while (next.length < m[2].length) next = "0" + next;
+          $("invNo").value = m[1] + next;
+        }
+      }
+      $("saveInvoiceBtn").addEventListener("click", function(){
+        var d = collectInvoice();
+        sessionInvoices.push(d);
+        renderSession();
+        toast("Invoice " + d.no + " added to this session's list.");
+        bumpInvoiceNo();
+        renderInvoice();
+      });
+      $("newInvoiceBtn").addEventListener("click", function(){
+        $("custName").value = ""; $("custAddr").value = ""; $("custPhone").value = ""; $("custGstin").value = "";
+        $("discPct").value = 0;
+        itemsBody.innerHTML = ""; addItemRow("", 1, "");
+        renderInvoice();
+      });
+
+      /* ================= LETTERHEAD ================= */
+      function collectLetter(){
+        return {
+          date: $("letDate").value, ref: $("letRef").value.trim(),
+          to: $("letTo").value, subject: $("letSubject").value.trim(),
+          body: $("letBody").value, sign: $("letSign").value.trim() || "For EDEN Coffee"
+        };
+      }
+      function letterHTML(l, blank){
+        var inner = letterheadTop();
+        if (!blank){
+          var meta = "";
+          if (l.date) meta += "Date: " + esc(fmtDate(l.date)) + "<br>";
+          if (l.ref) meta += "Ref: " + esc(l.ref) + "<br>";
+          if (l.to.trim()) meta += "<br>To,<br>" + nl2br(l.to);
+          if (meta) inner += '<div class="letter-meta">' + meta + "</div>";
+          if (l.subject) inner += "<h4>Subject: " + esc(l.subject) + "</h4>";
+          inner += '<div class="letter-body">' + (l.body.trim() ? esc(l.body) : '<span style="color:rgba(41,26,20,.45);">Your letter appears here as you type…</span>') + "</div>";
+          inner += '<div class="sign"><div class="sig-space"></div>' + esc(l.sign) + "</div>";
+        } else {
+          inner += '<div style="height:34rem;"></div><div class="sign"><div class="sig-space"></div>For EDEN Coffee</div>';
+        }
+        return inner + letterheadFoot();
+      }
+      function renderLetter(){
+        $("letterPaper").innerHTML = letterHTML(collectLetter(), false);
+      }
+      ["letDate","letRef","letTo","letSubject","letBody","letSign"].forEach(function(id){
+        $(id).addEventListener("input", renderLetter);
+      });
+      $("clearLetterBtn").addEventListener("click", function(){
+        $("letRef").value = ""; $("letTo").value = ""; $("letSubject").value = ""; $("letBody").value = "";
+        renderLetter();
+      });
+      $("dlLetterBtn").addEventListener("click", function(){
+        download("EDEN-Letter-" + ($("letDate").value || todayISO()) + ".html", docShell("EDEN Coffee — Letter", letterHTML(collectLetter(), false)));
+        toast("Letter downloaded on EDEN letterhead.");
+      });
+      $("dlBlankBtn").addEventListener("click", function(){
+        download("EDEN-Letterhead.html", docShell("EDEN Coffee — Letterhead", letterHTML(collectLetter(), true)));
+        toast("Blank letterhead downloaded.");
+      });
+
+      /* ---------- init ---------- */
+      applyTheme();
+      applyBiz(true);
+      $("invDate").value = todayISO();
+      $("letDate").value = todayISO();
+      addItemRow("", 1, "");
+      renderInvoice();
+      renderLetter();
+      renderSession();
+      paintLogin();
+    })();
+    </script>
+  </body>
+</html>
