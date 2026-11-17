@@ -534,8 +534,15 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
 .oc-total{font-family:var(--serif);font-size:21px;font-weight:700}
 .orders-card{max-width:720px}
 .orders-card .pd-body{padding:34px 32px}
-.dashboard-card{max-width:780px}
-.dashboard-card .pd-body{padding:34px 32px}
+.dash-page{padding:calc(var(--hdr) + 42px) 0 96px;background:var(--cream)}
+.dash-page[hidden]{display:none}
+.dash-wrap{max-width:860px;margin:0 auto;padding:0 clamp(18px,4vw,48px)}
+.dash-back{margin-bottom:26px}
+.dash-head{margin-bottom:26px}
+.dash-kicker{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.dash-head h2{font-size:clamp(36px,5.4vw,50px);margin:8px 0 0}
+.dash-panel{background:var(--soft);border:1px solid var(--line);border-radius:22px;padding:38px 36px;box-shadow:0 30px 60px -30px rgba(41,26,20,.28)}
+@media(max-width:820px){.dash-panel{padding:28px 20px}}
 .dash-sec{margin-top:30px;border-top:1px solid var(--line);padding-top:24px}
 .dash-sec:first-of-type{margin-top:8px;border-top:none;padding-top:0}
 .dash-sec h4{font-family:var(--serif);font-size:24px;margin:0 0 4px;color:var(--espresso)}
@@ -1079,16 +1086,23 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
   </div>
 </div>
 
-<!-- ================= CUSTOMER DASHBOARD =================
+<!-- ================= CUSTOMER DASHBOARD (full page) =================
      One place for everything after sign-in: profile, address book,
-     current orders, previous orders, change password and sign out.
-     Replaces the old separate My Account and My Orders popups. -->
-<div class="modal" id="dashboardModal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
-  <div class="modal-card dashboard-card">
-    <button class="x-btn modal-x" type="button" data-close="dashboardModal" aria-label="Close dashboard">&#10005;</button>
-    <div class="pd-body">
-      <span style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);font-weight:600">EDEN Coffee · Your Account</span>
-      <h3 id="accountTitle">My Dashboard</h3>
+     current orders, previous orders and sign out. This is a dedicated
+     PAGE, not a popup: opening it swaps the main content and footer
+     out and shows this section in their place; "Back to Site" (or any
+     site nav link) swaps back. There is deliberately NO change-password
+     option here — a customer who wants a new password uses
+     "Forgot Password?" on the sign-in screen before logging in, which
+     sends Firebase's password-reset email. -->
+<section class="dash-page" id="dashboardPage" hidden aria-labelledby="accountTitle">
+  <div class="dash-wrap">
+    <button class="btn ghost small dash-back" type="button" id="dashBackBtn">&#8592;&nbsp; Back to Site</button>
+    <div class="dash-head">
+      <span class="dash-kicker">EDEN Coffee · Your Account</span>
+      <h2 id="accountTitle">My Dashboard</h2>
+    </div>
+    <div class="dash-panel">
 
       <div class="dash-sec">
         <h4>Profile</h4>
@@ -1138,26 +1152,13 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
         <p style="color:var(--ink-soft);margin-top:14px;font-size:14px">Need help with an order? Message us on <a href="https://wa.me/252657366648" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Support on WhatsApp</a> or <a href="https://wa.me/919059907128" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Chat on WhatsApp</a>.</p>
       </div>
 
-      <div class="dash-sec">
-        <h4>Change Password</h4>
-        <p class="dash-sub">Set a new password for your email sign-in. You will be asked for your current password first.</p>
-        <form class="form" id="changePwForm" novalidate>
-          <label>Current password<span class="pw-wrap"><input type="password" id="cpCurrent" autocomplete="current-password" placeholder="Your current password"/><button class="pw-toggle" type="button" id="pwToggleCpCurrent" aria-label="Show or hide current password">Show</button></span></label>
-          <label>New password<span class="pw-wrap"><input type="password" id="cpNew" autocomplete="new-password" placeholder="New password"/><button class="pw-toggle" type="button" id="pwToggleCpNew" aria-label="Show or hide new password">Show</button></span></label>
-          <p class="field-hint">New password must be at least 8 characters, with a letter and a number.</p>
-          <label>Confirm new password<span class="pw-wrap"><input type="password" id="cpNew2" autocomplete="new-password" placeholder="Type the new password again"/><button class="pw-toggle" type="button" id="pwToggleCpNew2" aria-label="Show or hide confirm new password">Show</button></span></label>
-          <p class="field-err" id="cpErr" role="alert"></p>
-          <p class="field-ok" id="cpOk" role="status"></p>
-          <div><button class="btn solid" type="submit" id="cpSubmit" style="width:100%;justify-content:center">Change Password</button></div>
-        </form>
-      </div>
-
       <div class="dash-signout-row">
         <button class="btn ghost" type="button" id="signOutBtn">Sign Out</button>
+        <button class="btn ghost" type="button" id="dashBackBtn2">Back to Site</button>
       </div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- ================= DELIVERY DETAILS (order time only) ================= -->
 <div class="modal" id="deliveryModal" role="dialog" aria-modal="true" aria-labelledby="deliveryTitle">
@@ -2158,7 +2159,7 @@ function openModal(id){ $("#"+id).classList.add("on"); }
 function closeModal(id){ $("#"+id).classList.remove("on"); }
 $$("[data-close]").forEach(b=> b.addEventListener("click", ()=> closeModal(b.dataset.close)));
 $$(".modal").forEach(m=> m.addEventListener("click", e=>{ if(e.target===m) m.classList.remove("on"); }));
-document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ ["authModal","dashboardModal","deliveryModal"].forEach(closeModal); closeCart(); } });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ ["authModal","deliveryModal"].forEach(closeModal); closeCart(); } });
 
 /* ---------------- sign-in & account — real Firebase Auth + Firestore ----------------
    One modal, switched views: Sign In, Sign Up (registration), Check
@@ -2982,65 +2983,62 @@ function fillDashboard(){
   const aCcEl = $("#aCc"); if(aCcEl && profile.countryCode) aCcEl.value = profile.countryCode;
   $("#accErr").textContent = "";
   const accOk = $("#accOk"); if(accOk) accOk.textContent = "";
-  ["cpCurrent","cpNew","cpNew2"].forEach(id=>{ const el = $("#"+id); if(el) el.value = ""; });
-  const cpErr = $("#cpErr"); if(cpErr) cpErr.textContent = "";
-  const cpOk = $("#cpOk"); if(cpOk) cpOk.textContent = "";
   closeAddrForm();
   renderAddresses();
   renderOrders();
 }
+/* The dashboard is a PAGE, not a popup: showing it swaps the site's
+   main content and footer out and puts the dashboard section in their
+   place; closing it swaps back. The header (with the customer's name,
+   cart and nav) stays in place throughout, exactly like any other
+   page of the site. */
+let dashboardOpen = false;
+function showDashboardPage(){
+  dashboardOpen = true;
+  const main = document.querySelector("main"); if(main) main.style.display = "none";
+  const foot = document.querySelector("footer"); if(foot) foot.style.display = "none";
+  $("#dashboardPage").hidden = false;
+  window.scrollTo(0, 0);
+}
+function closeDashboardPage(){
+  if(!dashboardOpen) return;
+  dashboardOpen = false;
+  $("#dashboardPage").hidden = true;
+  const main = document.querySelector("main"); if(main) main.style.display = "";
+  const foot = document.querySelector("footer"); if(foot) foot.style.display = "";
+}
 function openDashboard(toOrders){
   if(!user){ return; }
   fillDashboard();
-  openModal("dashboardModal");
+  showDashboardPage();
   loadOrders().then(()=> renderOrders());
   if(toOrders){
-    setTimeout(()=>{ const s = $("#dashOrdersSec"); if(s) s.scrollIntoView({block: "start"}); }, 60);
+    setTimeout(()=>{
+      const s = $("#dashOrdersSec"); if(!s) return;
+      const y = s.getBoundingClientRect().top + window.scrollY - (parseInt(getComputedStyle(document.documentElement).getPropertyValue("--hdr")) + 18 || 94);
+      window.scrollTo(0, Math.max(0, y));
+    }, 60);
   }
 }
-/* Change Password — Firebase requires a recent sign-in for this, so the
-   current password re-authenticates the customer first, then
-   updatePassword sets the new one. Accounts with no password yet (set
-   up before email sign-in) set one via "Forgot Password?" instead. */
-wirePwToggle("pwToggleCpCurrent", "cpCurrent");
-wirePwToggle("pwToggleCpNew", "cpNew");
-wirePwToggle("pwToggleCpNew2", "cpNew2");
-const _cpForm = $("#changePwForm");
-if(_cpForm) _cpForm.addEventListener("submit", async e=>{
-  e.preventDefault();
-  const err = $("#cpErr"), ok = $("#cpOk");
-  err.textContent = ""; ok.textContent = "";
-  const current = $("#cpCurrent").value, next = $("#cpNew").value, next2 = $("#cpNew2").value;
-  if(!fbAuth || !fbUser){ err.textContent = "Please sign in again to change your password."; return; }
-  const hasPassword = (fbUser.providerData || []).some(p=> p.providerId === "password");
-  if(!hasPassword){ err.textContent = "This account has no password set yet. Sign out and use \u201CForgot Password?\u201D on the sign-in screen to set one, then sign in with your email and password."; return; }
-  if(!current){ err.textContent = "Please enter your current password."; return; }
-  if(!validPassword(next)){ err.textContent = "Please choose a stronger password — at least 8 characters, with a letter and a number."; return; }
-  if(next !== next2){ err.textContent = "The two new passwords do not match. Please type them again."; return; }
-  const btn = $("#cpSubmit");
-  const original = btn.textContent;
-  btn.disabled = true; btn.textContent = "Changing\u2026";
-  try {
-    const cred = firebase.auth.EmailAuthProvider.credential(fbUser.email, current);
-    await fbUser.reauthenticateWithCredential(cred);
-    await fbUser.updatePassword(next);
-    ["cpCurrent","cpNew","cpNew2"].forEach(id=>{ $("#"+id).value = ""; });
-    ok.textContent = "Your password has been changed. Use the new password the next time you sign in.";
-  } catch(e2){
-    if(e2 && (e2.code === "auth/wrong-password" || e2.code === "auth/invalid-credential")){
-      err.textContent = "The current password is incorrect. Please try again.";
-    } else if(e2 && e2.code === "auth/weak-password"){
-      err.textContent = "That new password is too weak \u2014 please use at least 8 characters, with a letter and a number.";
-    } else if(e2 && e2.code === "auth/too-many-requests"){
-      err.textContent = "Too many requests — please wait a little and try again.";
-    } else if(e2 && e2.code === "auth/requires-recent-login"){
-      err.textContent = "For security, please sign out and sign in again, then change your password.";
-    } else {
-      err.textContent = "We could not change your password. Please try again.";
-    }
-  }
-  btn.disabled = false; btn.textContent = original;
+["dashBackBtn","dashBackBtn2"].forEach(id=>{
+  const b = $("#"+id);
+  if(b) b.addEventListener("click", closeDashboardPage);
 });
+/* Any site navigation link (header nav, wordmark, footer, mobile menu)
+   leaves the dashboard page and returns to the normal site view, so
+   the anchor it points at is visible again. The mobile-menu account
+   entries run their own handlers and are left to them. */
+document.addEventListener("click", e=>{
+  if(!dashboardOpen) return;
+  const a = e.target.closest("a[href^='#']");
+  if(!a) return;
+  if(a.id === "mmAccount" || a.id === "mmOrders") return;
+  if(a.closest("#dashboardPage")) return;
+  closeDashboardPage();
+});
+/* No change-password in the dashboard, by design: a customer who
+   wants a new password signs out and uses "Forgot Password?" on the
+   sign-in screen, which sends Firebase's password-reset email. */
 $("#accountForm").addEventListener("submit", async e=>{
   e.preventDefault();
   const name = $("#aName").value, mobile = $("#aMobile").value;
@@ -3062,7 +3060,7 @@ $("#accountForm").addEventListener("submit", async e=>{
 $("#signOutBtn").addEventListener("click", async ()=>{
   try { if(fbAuth) await fbAuth.signOut(); } catch(e){}
   fbUser = null; user = null; profile = null; orders = []; addresses = []; defaultAddressIndex = 0;
-  syncAuthUI(); renderCart(); closeModal("dashboardModal");
+  syncAuthUI(); renderCart(); closeDashboardPage();
   showToast("You are signed out. Your cart still holds your items.");
 });
 [["mmAccount", ()=>{ if(user){ openDashboard(); } else openAuth(); }],
@@ -3102,7 +3100,7 @@ function renderOrders(){
       if(!c.pid){ skipped++; return; }
       addToCart({pid:c.pid, name:c.name, size:c.size, price:c.price, form:c.form, brew:c.brew}, false);
     });
-    closeModal("dashboardModal"); openCart();
+    closeDashboardPage(); openCart();
     showToast(skipped ? "Your previous order is back in the cart \u2014 " + skipped + (skipped === 1 ? " item" : " items") + " could not be re-added." : "Your previous order is back in the cart.");
   })));
 }
