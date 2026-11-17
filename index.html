@@ -939,11 +939,8 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
           <div id="notRegisteredBox" class="auth-ok-box" hidden style="margin:0 0 14px">
             <p>Not registered yet — please sign up. <button type="button" class="linklike" id="notRegGoSignUp">Create Account</button></p>
           </div>
-          <div id="legacyAccountBox" class="auth-ok-box" hidden style="margin:0 0 14px">
-            <p>This account was created before email sign-in and has no password yet. Use <button type="button" class="linklike" id="legacyGoForgot">Forgot Password?</button> to set a password, then sign in here with your email and new password.</p>
-          </div>
           <div id="unverifiedBox" class="auth-ok-box" hidden style="margin:0 0 14px">
-            <p>Please verify your email — check your inbox for the verification link from EDEN Coffee. <button type="button" class="linklike" id="unverifiedResend">Resend verification email</button></p>
+            <p>Your email address has not been verified yet — please check your inbox for the verification link from EDEN Coffee. <button type="button" class="linklike" id="unverifiedResend">Resend verification email</button></p>
             <p class="field-ok" id="unverifiedOk" role="status"></p>
           </div>
           <div><button class="btn solid" type="submit" id="emailSubmitSignIn" style="width:100%;justify-content:center">Sign In</button></div>
@@ -1028,6 +1025,9 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
         <div id="forgotOk" class="auth-ok-box" hidden>
           <p>If an account exists for this email, a reset link has been sent — check your inbox (and spam). The link expires and can only be used once.</p>
         </div>
+        <div id="forgotNotRegBox" class="auth-ok-box" hidden>
+          <p>Not registered yet — please sign up. <button type="button" class="linklike" id="forgotGoSignUp">Create Account</button></p>
+        </div>
         <p class="auth-foot-switch"><button type="button" class="linklike" id="forgotBack">Back to Sign In</button></p>
       </div>
       <!-- RESET PASSWORD — shown when the customer opens Firebase's
@@ -1089,7 +1089,7 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
       <form class="form" id="changePwForm" novalidate>
         <label>Current password<span class="pw-wrap"><input type="password" id="cpCurrent" autocomplete="current-password" placeholder="Your current password"/><button class="pw-toggle" type="button" id="pwToggleCpCurrent" aria-label="Show or hide current password">Show</button></span></label>
         <label>New password<span class="pw-wrap"><input type="password" id="cpNew" autocomplete="new-password" placeholder="New password"/><button class="pw-toggle" type="button" id="pwToggleCpNew" aria-label="Show or hide new password">Show</button></span></label>
-        <p class="field-hint">New password must be at least 6 characters.</p>
+        <p class="field-hint">New password must be at least 8 characters, with a letter and a number.</p>
         <label>Confirm new password<span class="pw-wrap"><input type="password" id="cpNew2" autocomplete="new-password" placeholder="Type the new password again"/><button class="pw-toggle" type="button" id="pwToggleCpNew2" aria-label="Show or hide confirm new password">Show</button></span></label>
         <p class="field-err" id="cpErr" role="alert"></p>
         <p class="field-ok" id="cpOk" role="status"></p>
@@ -2018,6 +2018,12 @@ $("#deliveryForm").addEventListener("submit", e=>{
     altParts = parts2;
     address += " | Alternate address: " + composeAddress(parts2);
   }
+  /* Signed-in guard: the order is built with user.uid / user.email, so
+     if the session ended while this form was open (sign-out in another
+     tab, expired session), stop with a clear message instead of
+     throwing silently and placing nothing. */
+  if(!user || !fbUser || fbUser.uid !== user.uid){ err.textContent = "Your sign-in has expired — please sign in again to place your order."; return; }
+  if(fbUser && fbUser.emailVerified === false){ err.textContent = "Please verify your email before placing your order — check your inbox for the verification link."; return; }
   err.textContent = "";
   orderPlacing = true;
   const placeBtn = $("#placeOrderBtn");
@@ -2132,18 +2138,22 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ ["authModal","ac
    -> the customer signs in with email + password. The account is NOT
    usable until verified: sign-in is gated on emailVerified, and an
    unverified sign-in attempt is stopped with a resend option.
-   SIGN IN is email + password only. An email with no sign-in methods
-   gets "Not registered yet — please sign up" with a link to Sign Up
-   (checked via fetchSignInMethodsForEmail before attempting sign-in);
-   a registered email with a wrong password gets an incorrect-password
-   message. Accounts created before email sign-in (Google-only, no
-   password provider) are guided to "Forgot Password?" to set a
-   password, then sign in with email + password — never locked out
-   silently. FORGOT PASSWORD is a separate workflow from verification
-   and uses Firebase's built-in sendPasswordResetEmail; reset links
-   return with ?mode=resetPassword&oobCode=… and are completed with
-   confirmPasswordReset. The reset form never reveals whether an email
-   has an account — the confirmation is always the same.
+   SIGN IN is email + password only, attempted directly (no
+   fetchSignInMethodsForEmail pre-check — see handlePasswordSignIn).
+   An unregistered email gets "Not registered yet — please sign up"
+   with a link to Sign Up when Firebase reports auth/user-not-found
+   (enumeration protection OFF); with enumeration protection ON,
+   auth/invalid-credential covers both unregistered and wrong-password
+   attempts and a combined message is shown. Accounts created before
+   email sign-in (no password) are guided by those messages to
+   "Forgot Password?" to set a password, then sign in with email +
+   password — never locked out silently. FORGOT PASSWORD is a separate
+   workflow from verification and uses Firebase's built-in
+   sendPasswordResetEmail; reset links return with
+   ?mode=resetPassword&oobCode=… and are completed with
+   confirmPasswordReset. An unregistered email there likewise gets
+   "Not registered yet — please sign up" when Firebase reports
+   auth/user-not-found (see handleForgotPassword).
    Firebase persists the session (LOCAL) and onAuthStateChanged drives
    the header. Mobile numbers are mandatory and format-validated, with
    the country code stored alongside; there is no mobile OTP anywhere.
@@ -2202,6 +2212,7 @@ function showForgotView(){
   showOnlyView("authForgotView", "Reset your password");
   const err = $("#forgotErr"); if(err) err.textContent = "";
   const ok = $("#forgotOk"); if(ok) ok.hidden = true;
+  const notReg = $("#forgotNotRegBox"); if(notReg) notReg.hidden = true;
 }
 function showResetPwView(){
   showOnlyView("authResetPwView", "Reset Your Password");
@@ -2226,7 +2237,7 @@ function openAuth(mode){
   if(mode !== "signup" && !AUTH.customer_login_enabled){ showToast("Sign-in opens at brand launch."); return; }
   authMode = mode || "signin";
   ["#authErrSignIn","#regErr","#detailsErr","#forgotErr","#resetPwErr"].forEach(sel=>{ const el = $(sel); if(el) el.textContent = ""; });
-  ["#signupDupBox","#forgotOk","#notRegisteredBox","#legacyAccountBox","#unverifiedBox"].forEach(sel=>{ const el = $(sel); if(el) el.hidden = true; });
+  ["#signupDupBox","#forgotOk","#forgotNotRegBox","#notRegisteredBox","#unverifiedBox"].forEach(sel=>{ const el = $(sel); if(el) el.hidden = true; });
   showAuthViews();
   openModal("authModal");
 }
@@ -2369,24 +2380,39 @@ function wirePwToggle(btnId, inputId){
 /* SIGN IN — email + password only. On success routeAfterAuth checks the
    Firestore profile: profile present signs straight in; no profile
    shows the profile-completion step.
-   UNREGISTERED-EMAIL RULE (owner's explicit order): before attempting
-   the sign-in, fetchSignInMethodsForEmail checks the email — no sign-in
-   methods means NO account, so the customer sees "Not registered yet —
-   please sign up" with a link straight to Sign Up, never the generic
-   credentials message. If methods exist and the password fails, the
-   message is the wrong-password one. LEGACY ACCOUNTS: an account whose
-   only sign-in method predates email sign-in has no password — the
-   customer is guided to "Forgot Password?" to set one, then signs in
-   with email + password. TRADE-OFF, chosen deliberately by the owner
-   for clarity: this reveals whether an email has an account. Firebase
-   itself rate-limits repeated failed attempts (auth/too-many-requests
-   is surfaced with a wait-and-retry message). */
+   NO fetchSignInMethodsForEmail pre-check: that method is deprecated
+   and, when email enumeration protection is ON (the default for
+   Firebase projects created after 15 Sep 2023), it returns an empty
+   list for EVERY email — using it here would show "Not registered yet"
+   and lock out every registered user without ever attempting sign-in.
+   Sign-in is therefore attempted directly with
+   signInWithEmailAndPassword, and the error codes map as follows:
+   - auth/user-not-found -> the #notRegisteredBox ("Not registered yet
+     — please sign up", the owner's explicit order). This code only
+     occurs when enumeration protection is OFF.
+   - auth/invalid-credential -> a combined message ("The email or
+     password is incorrect. If you have not registered yet, please sign
+     up. If this account was created before email sign-in, use Forgot
+     Password? to set a password."). When enumeration protection is ON,
+     this code covers BOTH the unregistered-email and wrong-password
+     cases, so the exact "Not registered yet" box cannot be shown and
+     the combined message is shown instead; the #notRegisteredBox is
+     NOT shown for this code, because a registered user with a wrong
+     password would be misled by it.
+   - auth/wrong-password -> the wrong-password message, which also
+     tells pre-email-sign-in (legacy) accounts to use Forgot Password?
+     to set a password — the legacy path is preserved by that wording
+     plus the #forgotLink on this view, which prefills the email into
+     the Forgot Password form.
+   - auth/too-many-requests -> the wait-and-retry message (Firebase
+     rate-limits repeated failed attempts).
+   The code works correctly whether enumeration protection is ON or
+   OFF. */
 async function handlePasswordSignIn(){
   const email = normEmail($("#fEmailSignIn").value);
   const password = $("#fPasswordSignIn").value;
   const err = $("#authErrSignIn");
   const notReg = $("#notRegisteredBox"); if(notReg) notReg.hidden = true;
-  const legacy = $("#legacyAccountBox"); if(legacy) legacy.hidden = true;
   const unver = $("#unverifiedBox"); if(unver) unver.hidden = true;
   if(!validEmail(email)){ err.textContent = "Please enter a valid email address."; return; }
   if(!password){ err.textContent = "Please enter your password."; return; }
@@ -2396,22 +2422,6 @@ async function handlePasswordSignIn(){
   const btn = $("#emailSubmitSignIn");
   btn.disabled = true; btn.textContent = "Signing in\u2026";
   try {
-    let methods = null;
-    try { methods = await fbAuth.fetchSignInMethodsForEmail(email); } catch(e){ methods = null; }
-    if(methods && methods.length === 0){
-      pendingFlow = null;
-      if(notReg) notReg.hidden = false;
-      btn.disabled = false; btn.textContent = "Sign In";
-      return;
-    }
-    if(methods && methods.indexOf("password") === -1){
-      /* No password on this account (created before email sign-in):
-         guide to Forgot Password to set one — never a dead end. */
-      pendingFlow = null;
-      if(legacy) legacy.hidden = false;
-      btn.disabled = false; btn.textContent = "Sign In";
-      return;
-    }
     const cred = await fbAuth.signInWithEmailAndPassword(email, password);
     if(cred && cred.user){
       /* Gate on emailVerified: unverified accounts do NOT get into My
@@ -2430,8 +2440,10 @@ async function handlePasswordSignIn(){
     if(e && e.code === "auth/user-not-found"){
       err.textContent = "";
       if(notReg) notReg.hidden = false;
-    } else if(e && (e.code === "auth/invalid-credential" || e.code === "auth/wrong-password")){
-      err.textContent = "The password is incorrect for this account. Please try again, or reset your password.";
+    } else if(e && e.code === "auth/invalid-credential"){
+      err.textContent = "The email or password is incorrect. If you have not registered yet, please sign up. If this account was created before email sign-in, use Forgot Password? to set a password.";
+    } else if(e && e.code === "auth/wrong-password"){
+      err.textContent = "The password is incorrect for this account. Please try again, or reset your password. If this account was created before email sign-in, use Forgot Password? to set a password.";
     } else if(e && e.code === "auth/too-many-requests"){
       err.textContent = "Too many attempts \u2014 please wait a little and try again, or reset your password.";
     } else {
@@ -2475,7 +2487,7 @@ async function handleRegister(){
   if(!password){ regSetErr("Please create a password."); return; }
   if(!validPassword(password)){ regSetErr("Please choose a stronger password — at least 8 characters, with a letter and a number."); return; }
   if(password !== password2){ regSetErr("The two passwords do not match. Please type them again."); return; }
-  if(!fbAuth || !fbDb){ regSetErr("Sign-up is unavailable right now \u2014 please try again shortly."); return; }
+  if(!fbAuth || !fbDb){ regSetErr("Account registration is temporarily unavailable. Please try again later."); return; }
   const btn = $("#regSubmit");
   const original = btn ? btn.textContent : "";
   if(btn){ btn.disabled = true; btn.textContent = "Creating your account\u2026"; }
@@ -2622,33 +2634,55 @@ function handleActionLink(){
    restored. For now the reset mail comes from Firebase's own sender
    (noreply@eden-coffee.firebaseapp.com) — the accepted temporary
    tradeoff until the card/backend step moves it to
-   no-reply@edencoffee.in. The on-screen result is ALWAYS the same
-   generic confirmation, whether or not the email has an account —
-   the form never reveals account existence. This is a separate
-   workflow from the registration verification link. */
+   no-reply@edencoffee.in. This is a separate workflow from the
+   registration verification link.
+   UNREGISTERED-EMAIL RULE (owner's explicit order, matching the
+   sign-in behaviour): if sendPasswordResetEmail throws
+   auth/user-not-found, the customer sees "Not registered yet — please
+   sign up" (#forgotNotRegBox) with a Create Account link to Sign Up,
+   instead of the generic confirmation. The generic #forgotOk
+   confirmation is shown ONLY when sendPasswordResetEmail resolves
+   without error (i.e. the email does have an account).
+   DEPENDENCY: the "Not registered yet" branch only triggers when
+   email enumeration protection is OFF in the Firebase console,
+   because when it is ON Firebase deliberately does not throw
+   user-not-found for an unregistered email — the call resolves and
+   the generic confirmation remains. No detection is faked here. */
 async function handleForgotPassword(){
   const email = normEmail($("#fForgotEmail").value);
   const err = $("#forgotErr");
   const ok = $("#forgotOk"); if(ok) ok.hidden = true;
+  const notReg = $("#forgotNotRegBox"); if(notReg) notReg.hidden = true;
   if(!validEmail(email)){ err.textContent = "Please enter a valid email address."; return; }
   if(!fbAuth){ err.textContent = "Password reset is unavailable right now \u2014 please try again shortly."; return; }
   err.textContent = "";
   const btn = $("#forgotSubmit");
   const original = btn.textContent;
   btn.disabled = true; btn.textContent = "Sending\u2026";
+  let sent = false;
   try {
     await fbAuth.sendPasswordResetEmail(email, FIREBASE_ACTION_SETTINGS);
+    sent = true;
   } catch(e){
-    /* Deliberately swallowed (except rate limiting): the confirmation
-       below is identical either way, so the form never discloses
-       whether an account exists for this email. */
     if(e && e.code === "auth/too-many-requests"){
       err.textContent = "Too many requests — please wait a little and try again.";
       btn.disabled = false; btn.textContent = original;
       return;
     }
+    if(e && e.code === "auth/user-not-found"){
+      /* Unregistered email (only thrown when enumeration protection
+         is OFF): say so plainly and offer Sign Up, like sign-in does. */
+      if(ok) ok.hidden = true;
+      if(notReg) notReg.hidden = false;
+      btn.disabled = false; btn.textContent = original;
+      return;
+    }
   }
-  if(ok) ok.hidden = false;
+  if(sent){
+    if(ok) ok.hidden = false;
+  } else {
+    err.textContent = "We could not send the reset email just now — please try again.";
+  }
   btn.disabled = false; btn.textContent = original;
 }
 /* Reset link landing: Firebase's reset mail returns here with
@@ -2737,11 +2771,7 @@ const _readyBtn = $("#readyContinueBtn"); if(_readyBtn) _readyBtn.addEventListen
   showToast("Your email is verified — please sign in to continue.");
 });
 const _nrUp = $("#notRegGoSignUp"); if(_nrUp) _nrUp.addEventListener("click", ()=>{ const b = $("#notRegisteredBox"); if(b) b.hidden = true; setAuthMode("signup"); });
-const _legacyForgot = $("#legacyGoForgot"); if(_legacyForgot) _legacyForgot.addEventListener("click", ()=>{
-  const em = normEmail($("#fEmailSignIn").value);
-  if(em) $("#fForgotEmail").value = em;
-  showForgotView();
-});
+const _fNrUp = $("#forgotGoSignUp"); if(_fNrUp) _fNrUp.addEventListener("click", ()=>{ const b = $("#forgotNotRegBox"); if(b) b.hidden = true; setAuthMode("signup"); });
 const _fForgot = $("#forgotForm"); if(_fForgot) _fForgot.addEventListener("submit", e=>{ e.preventDefault(); handleForgotPassword(); });
 const _forgotLink = $("#forgotLink"); if(_forgotLink) _forgotLink.addEventListener("click", ()=>{
   const em = $("#fEmailSignIn").value.trim();
@@ -2777,9 +2807,14 @@ if(_dForm) _dForm.addEventListener("submit", async e=>{
     if(msg){ err.textContent = msg; return; }
     const fu = fbUser || fbAuth.currentUser;
     if(!fu){ err.textContent = "Sign-in did not finish. Please try again."; return; }
-    profile = {name: name.trim(), mobile: normMobileFor(mobile, countryCode), countryCode: countryCode};
+    /* Save to Firestore FIRST: only once the save succeeds are the
+       in-memory signed-in state (profile / user) set, so a failed save
+       leaves the header and account state consistent with the unsaved
+       profile (both stay unset on the error path). */
+    const nextProfile = {name: name.trim(), mobile: normMobileFor(mobile, countryCode), countryCode: countryCode};
+    await saveProfileToFirestore(fu.uid, {name: nextProfile.name, email: fu.email || email, mobile: nextProfile.mobile, countryCode: countryCode});
+    profile = nextProfile;
     user = {uid: fu.uid, email: fu.email || email};
-    await saveProfileToFirestore(fu.uid, {name: profile.name, email: user.email, mobile: profile.mobile, countryCode: countryCode});
     completeSignIn();
   } catch(e3){
     err.textContent = "We could not finish your sign-in. Please check your details and try again.";
@@ -2836,7 +2871,7 @@ if(_cpForm) _cpForm.addEventListener("submit", async e=>{
   const hasPassword = (fbUser.providerData || []).some(p=> p.providerId === "password");
   if(!hasPassword){ err.textContent = "This account has no password set yet. Sign out and use \u201CForgot Password?\u201D on the sign-in screen to set one, then sign in with your email and password."; return; }
   if(!current){ err.textContent = "Please enter your current password."; return; }
-  if(!next || next.length < 6){ err.textContent = "Please choose a new password of at least 6 characters."; return; }
+  if(!validPassword(next)){ err.textContent = "Please choose a stronger password — at least 8 characters, with a letter and a number."; return; }
   if(next !== next2){ err.textContent = "The two new passwords do not match. Please type them again."; return; }
   const btn = $("#cpSubmit");
   const original = btn.textContent;
@@ -2851,7 +2886,9 @@ if(_cpForm) _cpForm.addEventListener("submit", async e=>{
     if(e2 && (e2.code === "auth/wrong-password" || e2.code === "auth/invalid-credential")){
       err.textContent = "The current password is incorrect. Please try again.";
     } else if(e2 && e2.code === "auth/weak-password"){
-      err.textContent = "That new password is too weak \u2014 please use at least 6 characters.";
+      err.textContent = "That new password is too weak \u2014 please use at least 8 characters, with a letter and a number.";
+    } else if(e2 && e2.code === "auth/too-many-requests"){
+      err.textContent = "Too many requests — please wait a little and try again.";
     } else if(e2 && e2.code === "auth/requires-recent-login"){
       err.textContent = "For security, please sign out and sign in again, then change your password.";
     } else {
