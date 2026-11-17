@@ -534,6 +534,20 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
 .oc-total{font-family:var(--serif);font-size:21px;font-weight:700}
 .orders-card{max-width:720px}
 .orders-card .pd-body{padding:34px 32px}
+.dashboard-card{max-width:780px}
+.dashboard-card .pd-body{padding:34px 32px}
+.dash-sec{margin-top:30px;border-top:1px solid var(--line);padding-top:24px}
+.dash-sec:first-of-type{margin-top:8px;border-top:none;padding-top:0}
+.dash-sec h4{font-family:var(--serif);font-size:24px;margin:0 0 4px;color:var(--espresso)}
+.dash-sec .dash-sub{color:var(--ink-soft);font-size:14.5px;margin:0 0 14px;line-height:1.55}
+.addr-card{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px;background:var(--cream)}
+.addr-card .addr-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.addr-card .addr-name{font-weight:600;font-size:15.5px;color:var(--espresso)}
+.addr-default-tag{background:var(--forest);color:var(--cream);border-radius:999px;padding:3px 11px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.addr-card .addr-line{font-size:14.5px;color:var(--ink-soft);line-height:1.55}
+.addr-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.addr-form-wrap{border:1px dashed var(--gold);border-radius:14px;padding:18px;margin-top:6px;background:var(--soft)}
+.dash-signout-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px;border-top:1px solid var(--line);padding-top:22px}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001s !important;transition-duration:.001s !important}
@@ -562,7 +576,7 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
     <div class="hdr-icons">
       <a class="wa-pill" id="waHeaderBtn" href="#" target="_blank" rel="noopener" aria-label="Chat with EDEN Coffee on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg><span class="wa-txt">WhatsApp</span></a>
       <button class="hdr-act" id="authBtn" type="button">Sign In</button>
-      <button class="hdr-act" id="ordersBtn" type="button">My Orders</button>
+      <button class="hdr-act" id="ordersBtn" type="button">Dashboard</button>
       <button class="icon-btn" id="cartBtn" type="button" aria-label="Open cart">
         <svg viewBox="0 0 24 24"><path d="M5.5 8h15l-1.6 9.5H7.2L5.5 8z"/><path d="M5.5 8L4.6 3.5H2.5"/><circle cx="9.5" cy="21" r="1.1"/><circle cx="17.5" cy="21" r="1.1"/></svg>
         <span class="cart-count" id="cartCount" hidden>0</span>
@@ -576,7 +590,7 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
 <div class="mobile-menu" id="mobileMenu">
   <a href="#home">Home</a><a href="#collections">Our Collections</a><a href="#shop">Shop</a><a href="#gifting">Gifting</a>
   <a href="#origins">Coffee Origins</a><a href="#story">Our Story</a><a href="#contact">Contact</a>
-  <a href="#" id="mmAccount">Sign In / My Account</a><a href="#" id="mmOrders">My Orders</a><a href="#" id="mmCart">Cart</a>
+  <a href="#" id="mmAccount">Sign In / My Dashboard</a><a href="#" id="mmOrders">My Orders</a><a href="#" id="mmCart">Cart</a>
 </div>
 
 <main id="home">
@@ -813,7 +827,7 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
         <p style="margin-top:18px"><b style="font-family:var(--serif);font-size:20px">EDEN Coffee</b><br/>DNSSS Shopping Complex, Podalakur Road, AK Nagar Post Office,<br/>Nellore, Andhra Pradesh — 524004 · Launching soon</p>
         <p style="margin-top:10px"><a href="https://maps.app.goo.gl/LcVhgjjwDbVJbSxn8" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Find us on Google Maps</a></p>
         <p style="margin-top:12px">Support (Anand): <a id="supportWa1" href="https://wa.me/252657366648" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Support on WhatsApp</a> or <a id="supportWa2" href="https://wa.me/919059907128" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Chat on WhatsApp</a> — for any support or query, you reach the owner directly.<br/>Local Store — Nellore: <a id="storeWa" href="https://wa.me/919441444715" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Local Store on WhatsApp</a> · <a id="storeTel" href="tel:+919441444715" style="color:var(--forest);text-decoration:underline">Call the store</a><br/>Email: <a href="mailto:hello@edencoffee.in" style="color:var(--forest);text-decoration:underline">hello@edencoffee.in</a></p>
-        <p style="margin-top:10px">Launching soon — orders open at brand launch. When ordering opens, placing an order in the shop will open WhatsApp to our store with your full order ready to send, with a second send of the same order to us, so both the store and we receive every order — and the store will confirm payment and delivery with you on WhatsApp.</p>
+        <p style="margin-top:10px">Launching soon — orders open at brand launch.</p>
       </div>
       <form class="form reveal" id="contactForm">
         <label>Your name<input required name="name" autocomplete="name" placeholder="e.g. Priya Sharma"/></label>
@@ -918,7 +932,7 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
     </div>
     <p class="free-ship" id="freeShipNote"></p>
     <button class="btn solid" id="checkoutBtn" type="button" style="width:100%;justify-content:center;margin-top:12px">Sign In to Place Order — Login Required to Order</button>
-    <p class="checkout-note">Launching soon — orders open at brand launch. When ordering opens, no payment will be taken on this website: Place Order will open WhatsApp to our store with your full order ready to send, then offer the same order to us from My Orders, so both the store and we receive it, and the store will confirm payment and delivery with you there. Your order will also appear in My Orders, starting at Placed.</p>
+    <p class="checkout-note">Launching soon — orders open at brand launch.</p>
   </div>
 </aside>
 
@@ -1065,36 +1079,82 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
   </div>
 </div>
 
-<!-- ================= MY ACCOUNT ================= -->
-<div class="modal" id="accountModal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
-  <div class="modal-card small-modal">
-    <button class="x-btn modal-x" type="button" data-close="accountModal" aria-label="Close account">&#10005;</button>
+<!-- ================= CUSTOMER DASHBOARD =================
+     One place for everything after sign-in: profile, address book,
+     current orders, previous orders, change password and sign out.
+     Replaces the old separate My Account and My Orders popups. -->
+<div class="modal" id="dashboardModal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+  <div class="modal-card dashboard-card">
+    <button class="x-btn modal-x" type="button" data-close="dashboardModal" aria-label="Close dashboard">&#10005;</button>
     <div class="pd-body">
-      <span style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);font-weight:600">EDEN Coffee · Account</span>
-      <h3 id="accountTitle">My Account</h3>
-      <p style="color:var(--ink-soft);margin-top:2px">Your profile — name, verified email and mobile — used to confirm and deliver your orders. Edit them any time. Changing your email address needs verification of the new address, so the email stays read-only here; contact us if you need it changed.</p>
-      <form class="form" id="accountForm" novalidate>
-        <label>Email<input type="email" id="aEmail" readonly style="opacity:.65"/></label>
-        <label>Full name<input id="aName" autocomplete="name"/></label>
-        <label>Mobile number<span class="cc-row"><select id="aCc" aria-label="Country code"><option value="+91" selected>+91 · India</option><option value="+252">+252 · Somalia</option><option value="+971">+971 · UAE</option><option value="+974">+974 · Qatar</option><option value="+966">+966 · Saudi Arabia</option><option value="+965">+965 · Kuwait</option><option value="+968">+968 · Oman</option><option value="+44">+44 · UK</option><option value="+1">+1 · USA / Canada</option><option value="+61">+61 · Australia</option><option value="+65">+65 · Singapore</option><option value="+60">+60 · Malaysia</option></select><input id="aMobile" inputmode="tel" autocomplete="tel"/></span></label>
-        <p class="field-err" id="accErr" role="alert"></p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn solid" type="submit">Save Changes</button>
-          <button class="btn ghost" type="button" id="signOutBtn">Sign Out</button>
+      <span style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);font-weight:600">EDEN Coffee · Your Account</span>
+      <h3 id="accountTitle">My Dashboard</h3>
+
+      <div class="dash-sec">
+        <h4>Profile</h4>
+        <p class="dash-sub">Your name, verified email and mobile — used to confirm and deliver your orders. Your email stays as it is here, because changing it needs verification of the new address; contact us if you need it changed.</p>
+        <form class="form" id="accountForm" novalidate>
+          <label>Email<input type="email" id="aEmail" readonly style="opacity:.65"/></label>
+          <label>Full name<input id="aName" autocomplete="name"/></label>
+          <label>Mobile number<span class="cc-row"><select id="aCc" aria-label="Country code"><option value="+91" selected>+91 · India</option><option value="+252">+252 · Somalia</option><option value="+971">+971 · UAE</option><option value="+974">+974 · Qatar</option><option value="+966">+966 · Saudi Arabia</option><option value="+965">+965 · Kuwait</option><option value="+968">+968 · Oman</option><option value="+44">+44 · UK</option><option value="+1">+1 · USA / Canada</option><option value="+61">+61 · Australia</option><option value="+65">+65 · Singapore</option><option value="+60">+60 · Malaysia</option></select><input id="aMobile" inputmode="tel" autocomplete="tel"/></span></label>
+          <p class="field-err" id="accErr" role="alert"></p>
+          <p class="field-ok" id="accOk" role="status"></p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn solid" type="submit">Save Changes</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="dash-sec">
+        <h4>My Addresses</h4>
+        <p class="dash-sub">Save your delivery addresses here and pick one when you order — no typing it out every time. One address is your default.</p>
+        <div id="addrList"></div>
+        <div><button class="btn ghost small" type="button" id="addAddrShowBtn">+ Add a New Address</button></div>
+        <div class="addr-form-wrap" id="addrFormWrap" hidden>
+          <p style="margin:0 0 12px;font-weight:600" id="addrFormTitle">Add a new address</p>
+          <form class="form" id="addrForm" novalidate>
+            <label>D. No<input id="adDno" autocomplete="address-line1"/></label>
+            <label>Street<input id="adStreet" autocomplete="address-line2"/></label>
+            <label>Landmark<input id="adLandmark"/></label>
+            <label>Area<input id="adArea"/></label>
+            <label>City<input id="adCity" autocomplete="address-level2"/></label>
+            <label>State<input id="adState" autocomplete="address-level1"/></label>
+            <label>Pincode<input id="adPincode" inputmode="numeric" autocomplete="postal-code"/></label>
+            <p class="field-err" id="addrErr" role="alert"></p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn solid" type="submit" id="addrSaveBtn">Save Address</button>
+              <button class="btn ghost" type="button" id="addrCancelBtn">Cancel</button>
+            </div>
+          </form>
         </div>
-      </form>
-      <p style="color:var(--ink-soft);margin-top:16px;font-size:14.5px"><b style="color:var(--espresso)">My Addresses — saved delivery address:</b> <span id="aSavedAddr">No delivery address saved yet — add one when you place your first order.</span></p>
-      <h4 style="margin:22px 0 4px">Change Password</h4>
-      <p style="color:var(--ink-soft);margin:0 0 12px;font-size:14.5px">Set a new password for your email sign-in. You will be asked for your current password first.</p>
-      <form class="form" id="changePwForm" novalidate>
-        <label>Current password<span class="pw-wrap"><input type="password" id="cpCurrent" autocomplete="current-password" placeholder="Your current password"/><button class="pw-toggle" type="button" id="pwToggleCpCurrent" aria-label="Show or hide current password">Show</button></span></label>
-        <label>New password<span class="pw-wrap"><input type="password" id="cpNew" autocomplete="new-password" placeholder="New password"/><button class="pw-toggle" type="button" id="pwToggleCpNew" aria-label="Show or hide new password">Show</button></span></label>
-        <p class="field-hint">New password must be at least 8 characters, with a letter and a number.</p>
-        <label>Confirm new password<span class="pw-wrap"><input type="password" id="cpNew2" autocomplete="new-password" placeholder="Type the new password again"/><button class="pw-toggle" type="button" id="pwToggleCpNew2" aria-label="Show or hide confirm new password">Show</button></span></label>
-        <p class="field-err" id="cpErr" role="alert"></p>
-        <p class="field-ok" id="cpOk" role="status"></p>
-        <div><button class="btn solid" type="submit" id="cpSubmit" style="width:100%;justify-content:center">Change Password</button></div>
-      </form>
+      </div>
+
+      <div class="dash-sec" id="dashOrdersSec">
+        <h4>Current Orders</h4>
+        <p class="dash-sub">Your order history and where each order has reached — Placed, Packed, Shipped, Delivered.</p>
+        <div id="currentOrdersList"></div>
+        <h4 style="margin-top:26px">Previous Orders</h4>
+        <div id="prevOrdersList"></div>
+        <p style="color:var(--ink-soft);margin-top:14px;font-size:14px">Need help with an order? Message us on <a href="https://wa.me/252657366648" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Support on WhatsApp</a> or <a href="https://wa.me/919059907128" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Chat on WhatsApp</a>.</p>
+      </div>
+
+      <div class="dash-sec">
+        <h4>Change Password</h4>
+        <p class="dash-sub">Set a new password for your email sign-in. You will be asked for your current password first.</p>
+        <form class="form" id="changePwForm" novalidate>
+          <label>Current password<span class="pw-wrap"><input type="password" id="cpCurrent" autocomplete="current-password" placeholder="Your current password"/><button class="pw-toggle" type="button" id="pwToggleCpCurrent" aria-label="Show or hide current password">Show</button></span></label>
+          <label>New password<span class="pw-wrap"><input type="password" id="cpNew" autocomplete="new-password" placeholder="New password"/><button class="pw-toggle" type="button" id="pwToggleCpNew" aria-label="Show or hide new password">Show</button></span></label>
+          <p class="field-hint">New password must be at least 8 characters, with a letter and a number.</p>
+          <label>Confirm new password<span class="pw-wrap"><input type="password" id="cpNew2" autocomplete="new-password" placeholder="Type the new password again"/><button class="pw-toggle" type="button" id="pwToggleCpNew2" aria-label="Show or hide confirm new password">Show</button></span></label>
+          <p class="field-err" id="cpErr" role="alert"></p>
+          <p class="field-ok" id="cpOk" role="status"></p>
+          <div><button class="btn solid" type="submit" id="cpSubmit" style="width:100%;justify-content:center">Change Password</button></div>
+        </form>
+      </div>
+
+      <div class="dash-signout-row">
+        <button class="btn ghost" type="button" id="signOutBtn">Sign Out</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1110,6 +1170,10 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
       <div id="payMethodWrap" hidden></div>
       <div id="cashfreeStatus" class="cashfree-status" hidden></div>
       <form class="form" id="deliveryForm" novalidate>
+        <div id="savedAddrPicker" hidden>
+          <label>Deliver to<select id="savedAddrSelect" aria-label="Choose a saved delivery address"></select></label>
+          <p class="field-hint">Pick one of your saved addresses, or type a different address below.</p>
+        </div>
         <label>Name of the Customer<input id="oName" autocomplete="name"/></label>
         <label>Mobile Number<input id="oMobile" inputmode="numeric" autocomplete="tel"/></label>
         <label>D. No<input id="oDno" autocomplete="address-line1"/></label>
@@ -1132,21 +1196,6 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
         <p class="field-err" id="deliveryErr" role="alert"></p>
         <div><button class="btn solid" type="submit" id="placeOrderBtn" style="width:100%;justify-content:center">Place Order on WhatsApp</button></div>
       </form>
-    </div>
-  </div>
-</div>
-
-<!-- ================= MY ORDERS ================= -->
-<div class="modal" id="ordersModal" role="dialog" aria-modal="true" aria-labelledby="ordersTitle">
-  <div class="modal-card orders-card">
-    <button class="x-btn modal-x" type="button" data-close="ordersModal" aria-label="Close orders">&#10005;</button>
-    <div class="pd-body">
-      <span style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);font-weight:600">EDEN Coffee · Orders</span>
-      <h3 id="ordersTitle">My Orders</h3>
-      <p style="color:var(--ink-soft);margin-top:2px">Your order history and where each order has reached — Placed, Packed, Shipped, Delivered. When orders open at brand launch, every order will go on WhatsApp to both our store and us — using the two send buttons on each order below, and the store will confirm payment and delivery with you there.</p>
-      <p style="color:var(--ink-soft);margin-top:6px;font-size:14px">For the billing counter: when ordering opens, every order below will have <b>Copy Order for Billing Counter</b> and <b>Download Order Record</b> buttons, so the counter can enter it into the EDEN billing app as an Online bill. Your orders are saved to your EDEN account; automatic display inside the billing app (a New Online Orders list with a Confirm button that turns the order into a bill) will follow once the billing app is connected to the same account system — until then, orders reach the counter by WhatsApp (both numbers) plus Copy / Download here.</p>
-      <p style="color:var(--ink-soft);margin-top:6px;font-size:14px">Need help with an order? Message us on <a href="https://wa.me/252657366648" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Support on WhatsApp</a> or <a href="https://wa.me/919059907128" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Chat on WhatsApp</a>.</p>
-      <div id="ordersList" style="margin-top:18px"></div>
     </div>
   </div>
 </div>
@@ -1197,8 +1246,8 @@ const LAUNCH = {
 /* Launching Soon mode for this publish: browsing and login are live, prices are hidden, ordering is NOT.
    ORDERING_OPEN=false in this publish. It is derived from LAUNCH and kept as the working flag the
    product, gift, cart and checkout code below all read. At brand launch,
-   enabling the LAUNCH checkout/order flags turns ordering on — Add to Cart,
-   WhatsApp ordering to both numbers, and the billing-counter order record. */
+   enabling the LAUNCH checkout/order flags turns ordering on — Add to Cart
+   and WhatsApp ordering to both numbers. */
 const ORDERING_OPEN = !!(LAUNCH.store_launch_enabled && LAUNCH.checkout_enabled && LAUNCH.order_creation_enabled);
 
 /* ---------------- Cashfree SANDBOX trial — TEST MODE only ----------------
@@ -1683,6 +1732,7 @@ if(!ORDERING_OPEN){ const gb = $("#giftAdd"); gb.disabled = true; gb.textContent
 /* ---------------- cart (guests welcome — sign-in only to order) ---------------- */
 let cart = [], shipMode = "standard";
 let user = null, profile = null, orders = [];
+let addresses = [], defaultAddressIndex = 0, editingAddrIdx = -1;
 let pendingCheckout = false, pendingOrders = false;
 
 /* ---------------- cart persistence ----------------
@@ -1821,12 +1871,11 @@ function buildOrderWhatsApp(o){
   return lines.join("\n");
 }
 function orderWhatsAppURL(o, num){ return "https://wa.me/" + (num || STORE_WA) + "?text=" + encodeURIComponent(buildOrderWhatsApp(o)); }
-/* ---------------- shared online order record — what the billing counter app reads ----------------
-   Each website order is stored as a structured record shaped like a billing-app bill
+/* ---------------- shared online order record ----------------
+   Each website order is stored as a structured record
    (items: name / size / form / price / qty, channel "Online", status "Placed").
    The order itself is written to Firestore (orders/{orderId}) by saveOrderToFirestore
-   below, so My Orders reads real account data. The record built here is what the
-   Copy / Download buttons in My Orders hand to the billing counter. */
+   below, so the dashboard reads real account data. */
 let onlineOrderRecords = [];
 function buildOrderRecord(o){
   return {
@@ -1845,18 +1894,7 @@ function buildOrderRecord(o){
     sync: "firebase"
   };
 }
-function billingSummaryText(r){
-  const lines = [];
-  lines.push("EDEN ONLINE ORDER — FOR BILLING COUNTER");
-  lines.push("Order: " + r.orderId + " · Status: " + r.status + " · Channel: " + r.channel);
-  lines.push("Customer: " + r.customer.name + " · Mobile: +91 " + r.customer.mobile);
-  lines.push("Address: " + r.customer.address);
-  lines.push("Items:");
-  r.items.forEach(it=>{ lines.push(it.name + " " + it.size + " (" + it.form + (it.grind ? " · " + it.grind : "") + ") x " + it.qty); });
-  lines.push("Delivery: " + (r.deliveryMode==="express" ? "Express" : "Standard"));
-  lines.push("Confirm in the billing app as an Online bill.");
-  return lines.join("\n");
-}
+
 /* ---------------- the real order write — Firestore orders/{orderId} ---------------- */
 async function saveOrderToFirestore(o){
   onlineOrderRecords.push(o.record || buildOrderRecord(o));
@@ -1881,24 +1919,6 @@ async function saveOrderToFirestore(o){
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   } catch(e){ /* the WhatsApp send and the local My Orders entry still carry the order */ }
-}
-function copyText(text){
-  if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
-  return new Promise(res=>{
-    const ta = document.createElement("textarea");
-    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand("copy"); } catch(e){}
-    ta.remove(); res();
-  });
-}
-function downloadOrderRecord(record){
-  const blob = new Blob([JSON.stringify(record, null, 2)], {type: "application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = record.orderId + "-online-order.json";
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=> URL.revokeObjectURL(a.href), 2000);
 }
 $("#checkoutBtn").addEventListener("click", ()=>{
   if(!ORDERING_OPEN){ showToast("Launching soon — orders open at brand launch."); return; }
@@ -1989,6 +2009,22 @@ function openDeliveryStep(){
   $("#oName").value = profile ? profile.name : "";
   $("#oMobile").value = profile ? profile.mobile : "";
   ["oDno","oStreet","oLandmark","oArea","oCity","oState","oPincode","o2Dno","o2Street","o2Landmark","o2Area","o2City","o2State","o2Pincode"].forEach(id=>{ $("#"+id).value = ""; });
+  /* Saved-address picker: choose which saved address to deliver to.
+     The default address is pre-selected and fills the fields below;
+     picking another refills them, and the fields stay editable. */
+  const picker = $("#savedAddrPicker"), sel = $("#savedAddrSelect");
+  if(picker && sel){
+    if(addresses.length){
+      sel.innerHTML = addresses.map((a, i)=> '<option value="' + i + '"' + (i === defaultAddressIndex ? " selected" : "") + '>' + escHtml(composeAddress(a)) + (i === defaultAddressIndex ? " (Default)" : "") + '</option>').join("");
+      fillAddrForm("o", addresses[defaultAddressIndex] || addresses[0]);
+      sel.onchange = ()=>{ const a = addresses[+sel.value]; if(a) fillAddrForm("o", a); };
+      picker.hidden = false;
+    } else {
+      picker.hidden = true;
+      sel.innerHTML = "";
+      sel.onchange = null;
+    }
+  }
   $("#addr2Wrap").hidden = true;
   $("#addAddrBtn").style.display = "";
   $("#deliveryErr").textContent = "";
@@ -2072,7 +2108,7 @@ $("#deliveryForm").addEventListener("submit", e=>{
     window.open(orderWhatsAppURL(order), "_blank", "noopener");
     cart = []; renderCart(); renderOrders();
     if(payMethod !== "cashfree"){
-      closeModal("deliveryModal"); openModal("ordersModal");
+      closeModal("deliveryModal"); openDashboard(true);
       showToast("Order placed \u2014 press send on WhatsApp to the store, then use the second send button here so we get the same order too.");
       return;
     }
@@ -2080,7 +2116,7 @@ $("#deliveryForm").addEventListener("submit", e=>{
     const statusBox = $("#cashfreeStatus");
     const showCfStatus = html=>{ if(statusBox){ statusBox.innerHTML = html; statusBox.hidden = false; } };
     const cfDoneNote = '<br/><a class="btn ghost small" target="_blank" rel="noopener" href="' + orderWhatsAppURL(order) + '">Send order on WhatsApp</a> <button class="btn solid small" type="button" id="cfViewOrders">View My Orders</button>';
-    const wireCfDone = ()=>{ const b = $("#cfViewOrders"); if(b) b.addEventListener("click", ()=>{ closeModal("deliveryModal"); renderOrders(); openModal("ordersModal"); }); };
+    const wireCfDone = ()=>{ const b = $("#cfViewOrders"); if(b) b.addEventListener("click", ()=>{ closeModal("deliveryModal"); openDashboard(true); }); };
     showCfStatus("<b>TEST MODE \u2014 no real money.</b> Your order " + order.id + " is placed and has been sent on WhatsApp. Opening the Cashfree test checkout\u2026");
     let sessionId = null;
     try {
@@ -2122,7 +2158,7 @@ function openModal(id){ $("#"+id).classList.add("on"); }
 function closeModal(id){ $("#"+id).classList.remove("on"); }
 $$("[data-close]").forEach(b=> b.addEventListener("click", ()=> closeModal(b.dataset.close)));
 $$(".modal").forEach(m=> m.addEventListener("click", e=>{ if(e.target===m) m.classList.remove("on"); }));
-document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ ["authModal","accountModal","ordersModal","deliveryModal"].forEach(closeModal); closeCart(); } });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ ["authModal","dashboardModal","deliveryModal"].forEach(closeModal); closeCart(); } });
 
 /* ---------------- sign-in & account — real Firebase Auth + Firestore ----------------
    One modal, switched views: Sign In, Sign Up (registration), Check
@@ -2266,17 +2302,18 @@ function completeSignIn(){
   showToast("Welcome, " + (profile ? profile.name : "friend") + " \u2014 you are signed in.");
   loadOrders().then(()=>{
     if(pendingCheckout){ pendingCheckout = false; saveCart(); openCart(); }
-    else if(pendingOrders){ pendingOrders = false; saveCart(); renderOrders(); openModal("ordersModal"); }
+    else if(pendingOrders){ pendingOrders = false; saveCart(); openDashboard(true); }
   });
 }
 function syncAuthUI(){
-  $("#authBtn").textContent = user ? (profile ? profile.name.split(" ")[0] : "My Account") : "Sign In";
-  $("#mmAccount").textContent = user ? "My Account" : "Sign In / My Account";
+  $("#authBtn").textContent = user ? (profile ? profile.name.split(" ")[0] : "My Dashboard") : "Sign In";
+  $("#mmAccount").textContent = user ? "My Dashboard" : "Sign In / My Dashboard";
 }
 async function saveProfileToFirestore(uid, data){
   const ref = fbDb.collection("users").doc(uid);
   const snap = await ref.get();
   const payload = { name: data.name, email: data.email, mobile: data.mobile, countryCode: data.countryCode || "+91", updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+  if(data.addresses !== undefined){ payload.addresses = data.addresses; payload.defaultAddressIndex = data.defaultAddressIndex || 0; }
   if(!snap.exists) payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
   await ref.set(payload, {merge: true});
 }
@@ -2337,6 +2374,7 @@ async function routeAfterAuth(fu){
     if(p && p.name && p.mobile){
       user = {uid: fu.uid, email: fu.email || p.email || ""};
       profile = {name: p.name, mobile: p.mobile, countryCode: p.countryCode || "+91"};
+      setAddressesFromProfile(p);
       completeSignIn();
     } else {
       showDetailsStep(fu.email || "", { showNotFoundNote: authMode === "signin" });
@@ -2348,7 +2386,7 @@ if(fbAuth){
   fbAuth.onAuthStateChanged(async fu=>{
     fbUser = fu;
     if(!fu){
-      if(user){ user = null; profile = null; orders = []; syncAuthUI(); renderCart(); }
+      if(user){ user = null; profile = null; orders = []; addresses = []; defaultAddressIndex = 0; syncAuthUI(); renderCart(); }
       return;
     }
     if(user && profile && user.uid === fu.uid && !$("#authModal").classList.contains("on")) { syncAuthUI(); return; }
@@ -2362,7 +2400,7 @@ if(fbAuth){
        its submit handler completes the sign-in after saving. */
     const det = $("#authDetailsView");
     if(det && !det.hidden && user === null) {
-      try { const p2 = await loadProfileFromFirestore(fu.uid); if(p2 && p2.name && p2.mobile){ user = {uid: fu.uid, email: fu.email || p2.email || ""}; profile = {name: p2.name, mobile: p2.mobile, countryCode: p2.countryCode || "+91"}; completeSignIn(); } } catch(e){}
+      try { const p2 = await loadProfileFromFirestore(fu.uid); if(p2 && p2.name && p2.mobile){ user = {uid: fu.uid, email: fu.email || p2.email || ""}; profile = {name: p2.name, mobile: p2.mobile, countryCode: p2.countryCode || "+91"}; setAddressesFromProfile(p2); completeSignIn(); } } catch(e){}
       return;
     }
     await routeAfterAuth(fu);
@@ -2822,12 +2860,12 @@ if(_dForm) _dForm.addEventListener("submit", async e=>{
 });
 
 $("#authBtn").addEventListener("click", ()=>{
-  if(user){ fillAccount(); openModal("accountModal"); }
+  if(user){ openDashboard(); }
   else if(fbUser){ showDetailsStep(fbUser.email || ""); openModal("authModal"); }
   else openAuth();
 });
 $("#ordersBtn").addEventListener("click", ()=>{
-  if(user){ loadOrders().then(()=>{ renderOrders(); openModal("ordersModal"); }); }
+  if(user){ openDashboard(true); }
   else { pendingOrders = true; saveCart(); openAuth(); showToast("Sign in to see your orders — your cart is saved as it is."); }
 });
 /* Firebase action-link landing on page load: ?mode=verifyEmail or
@@ -2836,22 +2874,128 @@ $("#ordersBtn").addEventListener("click", ()=>{
    exists. Verification and reset stay separate workflows. */
 handleActionLink();
 
-function fillAccount(){
+/* ---------------- address book (saved on the Firestore profile) ----------------
+   Addresses live on users/{uid} as an `addresses` array plus a
+   `defaultAddressIndex`. Each address carries the same seven fields
+   the delivery form uses: D.No, Street, Landmark, Area, City, State,
+   Pincode. The customer can add, edit and delete addresses, set one
+   as the default, and pick one at order time in the delivery step. */
+function cleanAddress(a){
+  if(!a || typeof a !== "object") return null;
+  const out = { dno: String(a.dno || ""), street: String(a.street || ""), landmark: String(a.landmark || ""), area: String(a.area || ""), city: String(a.city || ""), state: String(a.state || ""), pincode: String(a.pincode || "") };
+  return addressHasContent(out) ? out : null;
+}
+function setAddressesFromProfile(p){
+  addresses = (p && Array.isArray(p.addresses) ? p.addresses : []).map(cleanAddress).filter(Boolean);
+  defaultAddressIndex = (p && typeof p.defaultAddressIndex === "number" && p.defaultAddressIndex >= 0 && p.defaultAddressIndex < addresses.length) ? p.defaultAddressIndex : 0;
+}
+async function saveAddressesToFirestore(){
+  if(!fbUser || !fbDb || !profile || !user) return;
+  await saveProfileToFirestore(fbUser.uid, { name: profile.name, email: user.email, mobile: profile.mobile, countryCode: profile.countryCode || "+91", addresses: addresses, defaultAddressIndex: defaultAddressIndex });
+}
+function escHtml(s){ return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function renderAddresses(){
+  const list = $("#addrList");
+  if(!list) return;
+  if(!addresses.length){
+    list.innerHTML = '<div class="empty-cart" style="padding:26px 10px"><p>No addresses saved yet. Add your first delivery address below.</p></div>';
+    return;
+  }
+  list.innerHTML = addresses.map((a, i)=>
+    '<div class="addr-card"><div class="addr-head"><span class="addr-name">' + escHtml(profile ? profile.name : "") + '</span>'
+    + (i === defaultAddressIndex ? '<span class="addr-default-tag">Default</span>' : '')
+    + '</div><div class="addr-line">' + escHtml(composeAddress(a)) + '</div>'
+    + '<div class="addr-actions">'
+    + '<button class="btn ghost small" type="button" data-addr-edit="' + i + '">Edit</button>'
+    + '<button class="btn ghost small" type="button" data-addr-del="' + i + '">Delete</button>'
+    + (i === defaultAddressIndex ? '' : '<button class="btn ghost small" type="button" data-addr-default="' + i + '">Set as Default</button>')
+    + '</div></div>'
+  ).join("");
+  list.querySelectorAll("[data-addr-edit]").forEach(b=> b.addEventListener("click", ()=> openAddrForm(+b.dataset.addrEdit)));
+  list.querySelectorAll("[data-addr-del]").forEach(b=> b.addEventListener("click", async ()=>{
+    const i = +b.dataset.addrDel;
+    addresses.splice(i, 1);
+    if(defaultAddressIndex >= addresses.length) defaultAddressIndex = Math.max(0, addresses.length - 1);
+    else if(i < defaultAddressIndex) defaultAddressIndex--;
+    if(editingAddrIdx === i) closeAddrForm();
+    try { await saveAddressesToFirestore(); showToast("Address deleted."); }
+    catch(e){ showToast("We could not save that change. Please try again."); }
+    renderAddresses();
+  }));
+  list.querySelectorAll("[data-addr-default]").forEach(b=> b.addEventListener("click", async ()=>{
+    defaultAddressIndex = +b.dataset.addrDefault;
+    try { await saveAddressesToFirestore(); showToast("Default delivery address updated."); }
+    catch(e){ showToast("We could not save that change. Please try again."); }
+    renderAddresses();
+  }));
+}
+function fillAddrForm(prefix, a){
+  $("#"+prefix+"Dno").value = a ? a.dno : "";
+  $("#"+prefix+"Street").value = a ? a.street : "";
+  $("#"+prefix+"Landmark").value = a ? a.landmark : "";
+  $("#"+prefix+"Area").value = a ? a.area : "";
+  $("#"+prefix+"City").value = a ? a.city : "";
+  $("#"+prefix+"State").value = a ? a.state : "";
+  $("#"+prefix+"Pincode").value = a ? a.pincode : "";
+}
+function openAddrForm(idx){
+  editingAddrIdx = (typeof idx === "number" && idx >= 0) ? idx : -1;
+  $("#addrFormTitle").textContent = editingAddrIdx >= 0 ? "Edit address" : "Add a new address";
+  $("#addrSaveBtn").textContent = editingAddrIdx >= 0 ? "Save Changes" : "Save Address";
+  fillAddrForm("ad", editingAddrIdx >= 0 ? addresses[editingAddrIdx] : null);
+  $("#addrErr").textContent = "";
+  $("#addrFormWrap").hidden = false;
+}
+function closeAddrForm(){
+  editingAddrIdx = -1;
+  $("#addrFormWrap").hidden = true;
+  $("#addrErr").textContent = "";
+}
+const _addAddrShow = $("#addAddrShowBtn");
+if(_addAddrShow) _addAddrShow.addEventListener("click", ()=> openAddrForm(-1));
+const _addrCancel = $("#addrCancelBtn");
+if(_addrCancel) _addrCancel.addEventListener("click", closeAddrForm);
+const _addrForm = $("#addrForm");
+if(_addrForm) _addrForm.addEventListener("submit", async e=>{
+  e.preventDefault();
+  const parts = readAddress("ad");
+  const msg = checkAddress(parts);
+  if(msg){ $("#addrErr").textContent = msg; return; }
+  const wasEmpty = addresses.length === 0;
+  if(editingAddrIdx >= 0) addresses[editingAddrIdx] = parts; else addresses.push(parts);
+  if(wasEmpty) defaultAddressIndex = 0;
+  try {
+    await saveAddressesToFirestore();
+    closeAddrForm();
+    renderAddresses();
+    showToast("Address saved.");
+  } catch(e2){
+    $("#addrErr").textContent = "We could not save this address. Please try again.";
+  }
+});
+
+/* ---------------- the unified customer dashboard ---------------- */
+function fillDashboard(){
   if(!user || !profile) return;
   $("#aEmail").value = user.email; $("#aName").value = profile.name;
   $("#aMobile").value = profile.mobile;
   const aCcEl = $("#aCc"); if(aCcEl && profile.countryCode) aCcEl.value = profile.countryCode;
   $("#accErr").textContent = "";
+  const accOk = $("#accOk"); if(accOk) accOk.textContent = "";
   ["cpCurrent","cpNew","cpNew2"].forEach(id=>{ const el = $("#"+id); if(el) el.value = ""; });
   const cpErr = $("#cpErr"); if(cpErr) cpErr.textContent = "";
   const cpOk = $("#cpOk"); if(cpOk) cpOk.textContent = "";
-  /* Saved delivery address: read-only, taken from the most recent order. */
-  const addrEl = $("#aSavedAddr");
-  if(addrEl){
-    addrEl.textContent = "Loading\u2026";
-    loadOrders().then(()=>{
-      addrEl.textContent = (orders.length && orders[0].address) ? orders[0].address : "No delivery address saved yet \u2014 add one when you place your first order.";
-    });
+  closeAddrForm();
+  renderAddresses();
+  renderOrders();
+}
+function openDashboard(toOrders){
+  if(!user){ return; }
+  fillDashboard();
+  openModal("dashboardModal");
+  loadOrders().then(()=> renderOrders());
+  if(toOrders){
+    setTimeout(()=>{ const s = $("#dashOrdersSec"); if(s) s.scrollIntoView({block: "start"}); }, 60);
   }
 }
 /* Change Password — Firebase requires a recent sign-in for this, so the
@@ -2910,59 +3054,57 @@ $("#accountForm").addEventListener("submit", async e=>{
     catch(e2){ $("#accErr").textContent = "We could not save your changes. Please try again."; return; }
   }
   profile = next;
-  syncAuthUI(); closeModal("accountModal");
+  syncAuthUI();
+  const accOk = $("#accOk"); if(accOk) accOk.textContent = "Your details are saved.";
+  renderAddresses();
   showToast("Your details are saved.");
 });
 $("#signOutBtn").addEventListener("click", async ()=>{
   try { if(fbAuth) await fbAuth.signOut(); } catch(e){}
-  fbUser = null; user = null; profile = null; orders = [];
-  syncAuthUI(); renderCart(); closeModal("accountModal");
+  fbUser = null; user = null; profile = null; orders = []; addresses = []; defaultAddressIndex = 0;
+  syncAuthUI(); renderCart(); closeModal("dashboardModal");
   showToast("You are signed out. Your cart still holds your items.");
 });
-[["mmAccount", ()=>{ if(user){ fillAccount(); openModal("accountModal"); } else openAuth(); }],
+[["mmAccount", ()=>{ if(user){ openDashboard(); } else openAuth(); }],
  ["mmOrders", ()=> $("#ordersBtn").click()],
  ["mmCart", ()=> openCart()]].forEach(([id, fn])=>{
   const el = $("#"+id);
   el.addEventListener("click", e=>{ e.preventDefault(); mMenu.classList.remove("open"); fn(); });
 });
 
-/* ---------------- my orders & tracking ---------------- */
+/* ---------------- dashboard orders & tracking ----------------
+   Orders split two ways inside the dashboard: Current Orders are still
+   moving (Placed, Packed, Shipped) and keep the tracking stepper;
+   Previous Orders are finished (Delivered) with the full history. */
 function stepperHTML(status){
   const steps = ["Placed","Packed","Shipped","Delivered"];
   return '<div class="stepper">' + steps.map((s,i)=> '<div class="step' + (i<status ? " done" : i===status ? " done now" : "") + '">' + s + '</div>').join("") + '</div>';
 }
-function renderOrders(){
-  const list = $("#ordersList");
-  if(!orders.length){
-    list.innerHTML = '<div class="empty-cart"><p>' + (ORDERING_OPEN ? 'No orders yet. When you place an order, it will appear here with its tracking — Placed, Packed, Shipped, Delivered.' : 'No orders yet. Launching soon — orders open at brand launch. Once ordering opens, your orders will appear here with their tracking — Placed, Packed, Shipped, Delivered.') + '</p></div>';
-    return;
-  }
-  list.innerHTML = orders.map((o,oi)=>
-    '<div class="order-card"><h4>Order ' + o.id + '</h4><div class="oc-meta">Placed on ' + o.date + ' · Tracking</div>'
+function orderCardHTML(o, oi){
+  return '<div class="order-card"><h4>Order ' + o.id + '</h4><div class="oc-meta">Placed on ' + o.date + ' · Tracking</div>'
     + (o.paymentMethod === "cashfree" ? '<div class="oc-meta" style="margin-top:6px">Payment: Cashfree \u2014 TEST MODE \u2014 no real money · Status: test payment \u2014 unverified by server. The store will confirm payment and delivery on WhatsApp.</div>' : '')
     + stepperHTML(o.status)
     + '<div class="oc-items">' + o.items.map(c=> c.qty + " × " + c.name + " (" + itemMeta(c) + ")").join("<br/>") + '</div>'
-    + '<div class="oc-foot"><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><a class="btn ghost small" target="_blank" rel="noopener" href="' + orderWhatsAppURL(o, STORE_WA) + '">Send to Store on WhatsApp</a><a class="btn ghost small" target="_blank" rel="noopener" href="' + orderWhatsAppURL(o, SECOND_WA) + '">Send Second Copy on WhatsApp</a><button class="btn ghost small" type="button" data-copy="' + oi + '">Copy Order for Billing Counter</button><button class="btn ghost small" type="button" data-dl="' + oi + '">Download Order Record</button><button class="btn ghost small" type="button" data-reorder="' + oi + '">Reorder</button></span></div></div>'
-  ).join("");
-  list.querySelectorAll("[data-copy]").forEach(b=> b.addEventListener("click", ()=>{
-    const o = orders[+b.dataset.copy];
-    copyText(billingSummaryText(o.record || buildOrderRecord(o))).then(()=> showToast("Order " + o.id + " copied — the billing counter can enter it from the clipboard."));
-  }));
-  list.querySelectorAll("[data-dl]").forEach(b=> b.addEventListener("click", ()=>{
-    const o = orders[+b.dataset.dl];
-    downloadOrderRecord(o.record || buildOrderRecord(o));
-    showToast("Order " + o.id + " record downloaded for the billing counter.");
-  }));
-  list.querySelectorAll("[data-reorder]").forEach(b=> b.addEventListener("click", ()=>{
+    + '<div class="oc-foot"><span class="oc-total">' + (ORDERING_OPEN ? "\u20B9" + o.total : "") + '</span><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><a class="btn ghost small" target="_blank" rel="noopener" href="' + orderWhatsAppURL(o, STORE_WA) + '">Send to Store on WhatsApp</a><a class="btn ghost small" target="_blank" rel="noopener" href="' + orderWhatsAppURL(o, SECOND_WA) + '">Send Second Copy on WhatsApp</a><button class="btn ghost small" type="button" data-reorder="' + oi + '">Reorder</button></span></div></div>';
+}
+function renderOrders(){
+  const cur = $("#currentOrdersList"), prev = $("#prevOrdersList");
+  if(!cur || !prev) return;
+  const emptyMsg = ORDERING_OPEN ? 'No orders yet. When you place an order, it will appear here with its tracking — Placed, Packed, Shipped, Delivered.' : 'No orders yet. Launching soon — orders open at brand launch. Once ordering opens, your orders will appear here with their tracking — Placed, Packed, Shipped, Delivered.';
+  const current = [], previous = [];
+  orders.forEach((o, oi)=>{ (o.status >= 3 ? previous : current).push([o, oi]); });
+  cur.innerHTML = current.length ? current.map(([o, oi])=> orderCardHTML(o, oi)).join("") : '<div class="empty-cart"><p>' + (orders.length ? 'No orders on the way right now.' : emptyMsg) + '</p></div>';
+  prev.innerHTML = previous.length ? previous.map(([o, oi])=> orderCardHTML(o, oi)).join("") : '<div class="empty-cart"><p>No previous orders yet — delivered orders will appear here.</p></div>';
+  [cur, prev].forEach(list=> list.querySelectorAll("[data-reorder]").forEach(b=> b.addEventListener("click", ()=>{
     const o = orders[+b.dataset.reorder];
     let skipped = 0;
     o.items.forEach(c=>{
       if(!c.pid){ skipped++; return; }
       addToCart({pid:c.pid, name:c.name, size:c.size, price:c.price, form:c.form, brew:c.brew}, false);
     });
-    closeModal("ordersModal"); openCart();
+    closeModal("dashboardModal"); openCart();
     showToast(skipped ? "Your previous order is back in the cart \u2014 " + skipped + (skipped === 1 ? " item" : " items") + " could not be re-added." : "Your previous order is back in the cart.");
-  }));
+  })));
 }
 renderCart();
 
