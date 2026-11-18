@@ -1288,7 +1288,7 @@ const LAUNCH = {
    product, gift, cart and checkout code below all read. At brand launch,
    enabling the LAUNCH checkout/order flags turns ordering on — Add to Cart
    and WhatsApp ordering to both numbers. */
-const ORDERING_OPEN = !!(LAUNCH.store_launch_enabled && LAUNCH.checkout_enabled && LAUNCH.order_creation_enabled);
+let ORDERING_OPEN = !!(LAUNCH.store_launch_enabled && LAUNCH.checkout_enabled && LAUNCH.order_creation_enabled);
 
 /* ---------------- Cashfree SANDBOX trial — TEST MODE only ----------------
    Trial checkout in Cashfree sandbox mode: no real money, no production
@@ -1630,6 +1630,60 @@ function renderShop(filter){
   });
 }
 renderShop("all");
+
+/* ---------------- Remote catalogue + site settings (Firestore) ----------------
+   The admin panel (edencoffee.in/admin) manages products and launch settings
+   in Firestore. On load, this site reads them and applies them — with a full
+   fallback to the hardcoded catalogue and LAUNCH flags if Firestore is
+   unreachable, empty, or a document is malformed. Nothing here changes what
+   a visitor sees until the admin actually saves a different value.
+   - Products: Firestore `products` (active only) replaces the hardcoded
+     catalogue; the shop re-renders with the current filter.
+   - Settings: Firestore `settings/site`.orderingEnabled=true opens ordering
+     (LAUNCH flags + ORDERING_OPEN); supportWhatsApp/supportPhone update the
+     support numbers in CONTACT. The support email and Coming Soon headline /
+     message are stored by the admin but have no matching element on this
+     page, so they are not applied here. */
+(function applyRemoteCatalogue(){
+  if(!fbDb) return;
+  var db = fbDb;
+  db.collection("products").get().then(function(snap){
+    if(snap.empty) return;
+    var remote = [];
+    snap.forEach(function(d){
+      var p = d.data() || {};
+      if(p.active === false) return;
+      if(!p.id || !p.name || !Array.isArray(p.sizes) || !Array.isArray(p.prices)) return;
+      remote.push({
+        id: p.id, col: p.col || "EDEN Daily", name: p.name,
+        form: p.form || "", blend: p.blend || "",
+        sizes: p.sizes.slice(), prices: p.prices.map(function(x){ return Number(x) || 0; }),
+        desc: p.desc || "", brew: p.brew || ""
+      });
+    });
+    if(!remote.length) return;
+    PRODUCTS.length = 0;
+    remote.forEach(function(p){ PRODUCTS.push(p); });
+    var on = document.querySelector('#shopFilters button.on');
+    renderShop(on ? on.dataset.filter : "all");
+  }).catch(function(){ /* keep hardcoded catalogue */ });
+  db.collection("settings").doc("site").get().then(function(doc){
+    if(!doc.exists) return;
+    var s = doc.data() || {};
+    if(s.orderingEnabled === true){
+      LAUNCH.store_launch_enabled = true;
+      LAUNCH.checkout_enabled = true;
+      LAUNCH.order_creation_enabled = true;
+      ORDERING_OPEN = true;
+    }
+    if(typeof s.supportWhatsApp === "string" && s.supportWhatsApp.trim()){
+      CONTACT.supportPrimary = s.supportWhatsApp.replace(/\D/g, "");
+    }
+    if(typeof s.supportPhone === "string" && s.supportPhone.trim()){
+      CONTACT.supportSecond = s.supportPhone.replace(/\D/g, "");
+    }
+  }).catch(function(){ /* keep LAUNCH + CONTACT as published */ });
+})();
 $$("#shopFilters button").forEach(b=> b.addEventListener("click", ()=>{
   $$("#shopFilters button").forEach(x=> x.classList.toggle("on", x===b));
   renderShop(b.dataset.filter);
