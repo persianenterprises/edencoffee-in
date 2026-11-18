@@ -16,6 +16,9 @@
         document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
       } catch(e){} })();
     </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
       :root{
         --cream:#F6F0E5; --sand:#E9DECC; --soft:#FFFDF8;
@@ -102,9 +105,8 @@
         background:none; border:none; color:var(--ink-soft); font-family:var(--sans); font-size:.9rem;
         text-decoration:underline; text-underline-offset:3px; cursor:pointer; padding:.5rem; min-height:2.25rem;
       }
-      .reset-box{ margin-top:1rem; border-top:1px solid var(--line); padding-top:1rem; text-align:left; }
-      .reset-box p{ font-size:.92rem; color:var(--ink-soft); margin:.2rem 0 .8rem; }
-      .reset-actions{ display:flex; gap:.6rem; flex-wrap:wrap; }
+      .login-alt{ margin-top:1.1rem; border-top:1px solid var(--line); padding-top:1.1rem; display:grid; gap:.7rem; }
+      .login-note{ font-size:.88rem; color:var(--ink-faint); margin:1rem 0 0; }
 
       /* ---------- Dashboard shell ---------- */
       #dashView{ min-height:100vh; display:flex; flex-direction:column; }
@@ -140,6 +142,7 @@
       .panel-head{ margin-bottom:1.4rem; }
       .panel-head h2{ font-size:2rem; }
       .panel-head p{ color:var(--ink-soft); margin:.35rem 0 0; max-width:44rem; }
+      .panel-tools{ display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin-bottom:1.2rem; }
 
       /* ---------- Cards & lists ---------- */
       .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr)); gap:1.1rem; }
@@ -165,6 +168,45 @@
       .plain-list{ list-style:none; margin:0; padding:0; display:grid; gap:.55rem; font-size:.98rem; }
       .plain-list .sub{ color:var(--ink-faint); font-size:.88rem; display:block; }
       .note{ font-size:.9rem; color:var(--ink-soft); border-left:2px solid var(--gold); padding:.2rem 0 .2rem .9rem; margin-top:1.1rem; }
+
+      /* ---------- Stat cards ---------- */
+      .stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap:1.1rem; margin-bottom:1.6rem; }
+      .stat{ background:var(--soft); border:1px solid var(--line); padding:1.2rem 1.3rem; }
+      .stat .k{ font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); }
+      .stat .v{ font-family:var(--serif); font-size:2.1rem; font-weight:600; color:var(--forest); margin-top:.2rem; line-height:1.1; }
+      .stat .s{ font-size:.88rem; color:var(--ink-faint); margin-top:.2rem; }
+
+      /* ---------- Data tables ---------- */
+      .table-scroll{ overflow-x:auto; }
+      .data-table{ width:100%; border-collapse:collapse; background:var(--soft); border:1px solid var(--line); }
+      .data-table th,.data-table td{ text-align:left; padding:.7rem .9rem; border-bottom:1px solid var(--line); font-size:.95rem; vertical-align:top; }
+      .data-table th{ font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); }
+      .data-table tr.clickable{ cursor:pointer; }
+      .data-table tr.clickable:hover td{ background:var(--sand); }
+      .data-table td.num,.data-table th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+      .badge{ display:inline-block; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; border:1px solid var(--gold); color:var(--gold-deep); padding:.2rem .55rem; white-space:nowrap; }
+      .badge.admin{ background:var(--forest); border-color:var(--forest); color:#F6F0E5; }
+      :root[data-theme="dark"] .badge.admin{ color:#171310; }
+      .badge.ok{ border-color:var(--ok); color:var(--ok); }
+      .badge.muted{ border-color:var(--line-strong); color:var(--ink-faint); }
+      .err-msg{ color:var(--danger); font-size:.95rem; background:var(--soft); border:1px solid var(--danger); padding:.8rem 1rem; margin-bottom:1rem; }
+      .detail-head{ display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-bottom:1.2rem; }
+      .detail-head h3{ font-size:1.5rem; }
+      .kv{ display:grid; gap:.45rem; font-size:.98rem; }
+      .kv .row{ display:flex; gap:1rem; flex-wrap:wrap; }
+      .kv .k{ color:var(--ink-faint); font-size:.8rem; letter-spacing:.12em; text-transform:uppercase; min-width:8.5rem; padding-top:.15rem; }
+      .kv .v{ flex:1; min-width:12rem; }
+
+      /* ---------- Product cards ---------- */
+      .prod-card{ background:var(--soft); border:1px solid var(--line); padding:1.3rem 1.4rem; margin-bottom:1.1rem; }
+      .prod-card h3{ font-size:1.35rem; }
+      .prod-card .meta{ color:var(--ink-soft); font-size:.92rem; margin:.25rem 0 .4rem; }
+      .prod-card .desc{ font-size:.95rem; color:var(--ink-soft); margin:.3rem 0 .8rem; max-width:46rem; }
+      .price-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(8rem,1fr)); gap:.7rem; margin:.6rem 0 .9rem; }
+      .price-grid .field input{ text-align:right; }
+      .toggle-row{ display:flex; align-items:center; gap:.7rem; font-size:.95rem; }
+      .toggle-row input[type="checkbox"]{ width:1.25rem; height:1.25rem; accent-color:var(--forest); }
+      .prod-actions{ display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; }
 
       /* ---------- Forms ---------- */
       .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13.5rem),1fr)); gap:1rem; }
@@ -245,7 +287,6 @@
       @media (prefers-reduced-motion: reduce){ .toast{ transition:none; } }
 
       .dash-foot{ border-top:1px solid var(--line); padding:1.1rem 1.4rem; text-align:center; color:var(--ink-faint); font-size:.88rem; }
-      .dash-foot a{ color:var(--ink-soft); }
 
       @media print{
         body{ background:#fff; }
@@ -259,34 +300,29 @@
   </head>
   <body>
 
-    <!-- ================= LOGIN ================= -->
+    <!-- ================= LOGIN (Firebase) ================= -->
     <section id="loginView">
       <div class="login-card">
         <div class="wordmark">Eden<small>Coffee</small></div>
         <p class="login-path">edencoffee.in/admin</p>
         <div class="login-rule"></div>
-        <h1 id="loginTitle">Admin sign in</h1>
-        <p class="login-hint" id="loginHint">Enter the admin password for this page.</p>
+        <h1>Admin sign in</h1>
+        <p class="login-hint">Sign in with the EDEN admin account.</p>
         <form class="login-form" id="loginForm" autocomplete="off">
-          <label>Password
-            <input type="password" id="pwInput" autocomplete="current-password" />
+          <label>Email
+            <input type="email" id="loginEmail" autocomplete="username" placeholder="you@example.com" />
           </label>
-          <label id="pwConfirmWrap" hidden>Confirm password
-            <input type="password" id="pwConfirm" autocomplete="new-password" />
+          <label>Password
+            <input type="password" id="loginPw" autocomplete="current-password" />
           </label>
           <p class="form-error" id="loginError" role="alert"></p>
           <button class="btn" type="submit" id="loginBtn">Sign in</button>
         </form>
-        <div id="resetArea">
-          <button class="linklike" id="resetToggle" type="button" hidden>Forgot or reset the password</button>
-          <div class="reset-box" id="resetBox" hidden>
-            <p>Resetting clears the password saved in this browser. You will then set a new one. This only affects this page's gate — the website itself stays controlled by your GitHub sign-in.</p>
-            <div class="reset-actions">
-              <button class="btn small danger" id="resetConfirm" type="button">Yes, reset password</button>
-              <button class="btn small secondary" id="resetCancel" type="button">Cancel</button>
-            </div>
-          </div>
+        <div class="login-alt">
+          <button class="btn secondary" id="googleBtn" type="button">Continue with Google</button>
+          <button class="linklike" id="forgotBtn" type="button">Forgot password?</button>
         </div>
+        <p class="login-note">Only the EDEN admin account can use this page. Other accounts are signed out automatically.</p>
       </div>
     </section>
 
@@ -297,23 +333,46 @@
         <div class="adminbar-actions">
           <span class="admin-tag">Admin</span>
           <a class="btn small secondary" href="https://edencoffee.in" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;">View site</a>
-          <button class="btn small secondary" id="lockBtn" type="button">Lock</button>
+          <button class="btn small secondary" id="signOutBtn" type="button">Sign out</button>
         </div>
       </header>
 
       <nav class="tabs" role="tablist" aria-label="Admin sections">
-        <button class="tab" role="tab" data-tab="overview" aria-selected="true" type="button">Overview</button>
+        <button class="tab" role="tab" data-tab="dashboard" aria-selected="true" type="button">Dashboard</button>
+        <button class="tab" role="tab" data-tab="products" aria-selected="false" type="button">Products</button>
+        <button class="tab" role="tab" data-tab="orders" aria-selected="false" type="button">Orders</button>
+        <button class="tab" role="tab" data-tab="customers" aria-selected="false" type="button">Customers</button>
+        <button class="tab" role="tab" data-tab="reports" aria-selected="false" type="button">Reports</button>
+        <button class="tab" role="tab" data-tab="enquiries" aria-selected="false" type="button">Enquiries</button>
+        <button class="tab" role="tab" data-tab="content" aria-selected="false" type="button">Content</button>
         <button class="tab" role="tab" data-tab="billing" aria-selected="false" type="button">Billing</button>
         <button class="tab" role="tab" data-tab="letterhead" aria-selected="false" type="button">Letterhead</button>
         <button class="tab" role="tab" data-tab="settings" aria-selected="false" type="button">Settings</button>
       </nav>
 
       <main>
-        <!-- ========== OVERVIEW ========== -->
-        <section class="panel" data-panel="overview">
+        <!-- ========== DASHBOARD ========== -->
+        <section class="panel" data-panel="dashboard">
           <div class="panel-head">
-            <h2>Overview</h2>
-            <p>EDEN Coffee at a glance — the website, the mailboxes, and where everything is managed.</p>
+            <h2>Dashboard</h2>
+            <p>EDEN Coffee at a glance — live numbers from the website, plus the tools.</p>
+          </div>
+          <div class="panel-tools">
+            <button class="btn small secondary" id="refreshDashboard" type="button">Refresh</button>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="k">Customers</div><div class="v" id="statCustomers">—</div><div class="s" id="statCustomersSub">Signed-up accounts</div></div>
+            <div class="stat"><div class="k">Orders</div><div class="v" id="statOrders">—</div><div class="s" id="statOrdersSub">All orders so far</div></div>
+            <div class="stat"><div class="k">Revenue</div><div class="v" id="statRevenue">—</div><div class="s" id="statRevenueSub">Total of all orders</div></div>
+            <div class="stat"><div class="k">Products</div><div class="v" id="statProducts">—</div><div class="s" id="statProductsSub">In the catalogue</div></div>
+          </div>
+          <div id="dashError"></div>
+          <div class="card" style="margin-bottom:1.6rem;">
+            <h3>Recent orders</h3>
+            <div id="recentOrders"><p class="empty-msg">Loading…</p></div>
+            <div class="form-actions" style="margin-top:.8rem;">
+              <button class="btn small secondary" id="viewAllOrdersBtn" type="button">View all orders</button>
+            </div>
           </div>
           <div class="grid">
             <div class="card">
@@ -334,14 +393,13 @@
                 <li><a href="https://mail.zoho.com" target="_blank" rel="noopener"><span class="lname">Zoho Mail</span><span class="lurl">mail.zoho.com</span><span class="arrow">→</span></a></li>
                 <li><a href="https://www.instagram.com/edencoffeeindia/" target="_blank" rel="noopener"><span class="lname">Instagram</span><span class="lurl">@edencoffeeindia</span><span class="arrow">→</span></a></li>
                 <li><a href="https://wa.me/252657366648" target="_blank" rel="noopener" id="qlWa"><span class="lname">WhatsApp</span><span class="lurl" id="qlWaUrl">+252 657366648</span><span class="arrow">→</span></a></li>
-                <li><a href="mailto:hello@edencoffee.in" id="qlEmail"><span class="lname">Email</span><span class="lurl" id="qlEmailUrl">hello@edencoffee.in</span><span class="arrow">→</span></a></li>
+                <li><a href="mailto:anandbabu@edencoffee.in" id="qlEmail"><span class="lname">Email</span><span class="lurl" id="qlEmailUrl">anandbabu@edencoffee.in</span><span class="arrow">→</span></a></li>
               </ul>
             </div>
             <div class="card">
               <h3>Mailboxes</h3>
               <ul class="plain-list">
-                <li><strong>hello@edencoffee.in</strong><span class="sub">Super admin — sign in at Zoho Mail with the Persian Enterprises Google account.</span></li>
-                <li><strong>anandbabu@edencoffee.in</strong><span class="sub">Administrator.</span></li>
+                <li><strong>anandbabu@edencoffee.in</strong><span class="sub">Administrator — the main EDEN mailbox.</span></li>
                 <li><strong>ajithbabu@edencoffee.in</strong><span class="sub">Team mailbox.</span></li>
               </ul>
               <p class="note">On the free Zoho plan, mail is read in the Zoho Mail app or at mail.zoho.com — it can't be added to the Gmail app, and forwarding to other inboxes is a paid feature.</p>
@@ -352,8 +410,142 @@
                 <li><strong>Billing</strong><span class="sub">Make a tax invoice on the EDEN letterhead and download it — use the Billing tab above.</span></li>
                 <li><strong>Letterhead</strong><span class="sub">Write a letter on the official letterhead, or download a blank one — use the Letterhead tab above.</span></li>
               </ul>
-              <p class="note">This page is a simple gate for the owner's tools. Real control of the website stays with the GitHub repository, the GoDaddy domain, and the Zoho admin — those sign-ins are the actual keys.</p>
+              <p class="note">Real control of the website stays with the GitHub repository, the GoDaddy domain, and the Zoho admin — those sign-ins are the actual keys.</p>
             </div>
+          </div>
+        </section>
+
+        <!-- ========== PRODUCTS ========== -->
+        <section class="panel" data-panel="products" hidden>
+          <div class="panel-head">
+            <h2>Products</h2>
+            <p>The coffee catalogue, from Firestore. Edit a price or switch a product off, then Save that product.</p>
+          </div>
+          <div class="panel-tools">
+            <button class="btn small secondary" id="refreshProducts" type="button">Refresh</button>
+          </div>
+          <div id="productsList"><p class="empty-msg">Loading…</p></div>
+
+          <div class="card" style="margin-top:1.6rem;">
+            <h3>Add a product</h3>
+            <form id="addProdForm" autocomplete="off">
+              <div class="form-grid">
+                <div class="field"><label for="npName">Name</label><input id="npName" placeholder="e.g. Daily Classic" /></div>
+                <div class="field"><label for="npCol">Collection</label><select id="npCol"><option>EDEN Daily</option><option>EDEN Reserve</option><option>EDEN Signature</option></select></div>
+                <div class="field"><label for="npForm">Form</label><input id="npForm" placeholder="e.g. South Indian Filter Coffee Powder" /></div>
+                <div class="field"><label for="npBlend">Blend</label><input id="npBlend" placeholder="e.g. 80% Coffee · 20% Chicory" /></div>
+                <div class="field"><label for="npSizes">Sizes (comma-separated)</label><input id="npSizes" placeholder="100g, 250g, 500g, 1kg" /></div>
+                <div class="field"><label for="npPrices">Prices ₹ (comma-separated, same order)</label><input id="npPrices" placeholder="99, 199, 379, 699" /></div>
+                <div class="field full"><label for="npDesc">Description</label><textarea id="npDesc"></textarea></div>
+                <div class="field full"><label for="npBrew">Brewing guide</label><textarea id="npBrew" style="min-height:3.6rem;"></textarea></div>
+                <div class="field"><label class="toggle-row"><input type="checkbox" id="npActive" checked /> Active (visible on the site)</label></div>
+              </div>
+              <div class="form-actions" style="margin-top:1rem;">
+                <button class="btn" id="addProdBtn" type="submit">Add product</button>
+              </div>
+              <p class="form-error" id="addProdMsg" role="alert"></p>
+            </form>
+          </div>
+        </section>
+
+        <!-- ========== ORDERS ========== -->
+        <section class="panel" data-panel="orders" hidden>
+          <div class="panel-head">
+            <h2>Orders</h2>
+            <p>Orders from the website, newest first. Click a row to see the full order and change its status.</p>
+          </div>
+          <div class="panel-tools">
+            <button class="btn small secondary" id="refreshOrders" type="button">Refresh</button>
+          </div>
+          <div id="ordersList"><p class="empty-msg">Loading…</p></div>
+          <div id="orderDetail" hidden>
+            <div class="detail-head">
+              <button class="btn small secondary" id="odBack" type="button">← All orders</button>
+              <h3 id="odTitle">Order</h3>
+            </div>
+            <div class="card"><div id="odBody"></div></div>
+          </div>
+        </section>
+
+        <!-- ========== CUSTOMERS ========== -->
+        <section class="panel" data-panel="customers" hidden>
+          <div class="panel-head">
+            <h2>Customers</h2>
+            <p>Everyone who has signed up on the website. Click a row to see their profile, addresses and orders.</p>
+          </div>
+          <div class="panel-tools">
+            <button class="btn small secondary" id="refreshCustomers" type="button">Refresh</button>
+          </div>
+          <div id="customersList"><p class="empty-msg">Loading…</p></div>
+          <div id="customerDetail" hidden>
+            <div class="detail-head">
+              <button class="btn small secondary" id="cdBack" type="button">← All customers</button>
+              <h3 id="cdTitle">Customer</h3>
+            </div>
+            <div class="card"><div id="cdBody"></div></div>
+          </div>
+        </section>
+
+        <!-- ========== REPORTS ========== -->
+        <section class="panel" data-panel="reports" hidden>
+          <div class="panel-head">
+            <h2>Reports</h2>
+            <p>Computed from the website's orders. Nothing here is invented — empty means no sales yet.</p>
+          </div>
+          <div class="panel-tools">
+            <button class="btn small secondary" id="refreshReports" type="button">Refresh</button>
+          </div>
+          <div id="reportsBody"><p class="empty-msg">Loading…</p></div>
+        </section>
+
+        <!-- ========== ENQUIRIES ========== -->
+        <section class="panel" data-panel="enquiries" hidden>
+          <div class="panel-head">
+            <h2>Enquiries</h2>
+            <p>A tracker for enquiries that arrive on WhatsApp or by email. The website does not have an enquiry form yet — log them here as they come in.</p>
+          </div>
+          <div class="card" style="margin-bottom:1.4rem;">
+            <h3>Log an enquiry</h3>
+            <form id="addEnqForm" autocomplete="off">
+              <div class="form-grid">
+                <div class="field"><label for="enqName">Name</label><input id="enqName" placeholder="Who asked?" /></div>
+                <div class="field"><label for="enqContact">Contact</label><input id="enqContact" placeholder="Phone or email" /></div>
+                <div class="field full"><label for="enqMsg">Message</label><textarea id="enqMsg" style="min-height:3.6rem;" placeholder="What did they ask about?"></textarea></div>
+              </div>
+              <div class="form-actions" style="margin-top:1rem;">
+                <button class="btn" id="addEnqBtn" type="submit">Add enquiry</button>
+              </div>
+              <p class="form-error" id="addEnqMsg" role="alert"></p>
+            </form>
+          </div>
+          <div class="panel-tools">
+            <button class="btn small secondary" id="refreshEnquiries" type="button">Refresh</button>
+          </div>
+          <div id="enquiriesList"><p class="empty-msg">Loading…</p></div>
+        </section>
+
+        <!-- ========== CONTENT ========== -->
+        <section class="panel" data-panel="content" hidden>
+          <div class="panel-head">
+            <h2>Content</h2>
+            <p>Words and switches the live website reads. Save to publish them.</p>
+          </div>
+          <div class="card">
+            <form id="siteForm" autocomplete="off">
+              <div class="form-grid">
+                <div class="field full"><label for="siteHeadline">Coming Soon headline</label><input id="siteHeadline" placeholder="e.g. Something special is brewing." /></div>
+                <div class="field full"><label for="siteMessage">Coming Soon message</label><textarea id="siteMessage" placeholder="The short message visitors see on the Coming Soon page."></textarea></div>
+                <div class="field full"><label class="toggle-row"><input type="checkbox" id="siteOrdering" /> Ordering enabled — customers can place orders</label></div>
+                <div class="field"><label for="siteWa">Support WhatsApp</label><input id="siteWa" inputmode="tel" /></div>
+                <div class="field"><label for="sitePhone">Support phone</label><input id="sitePhone" inputmode="tel" /></div>
+                <div class="field full"><label for="siteEmail">Support email</label><input id="siteEmail" type="email" /></div>
+              </div>
+              <div class="form-actions" style="margin-top:1.2rem;">
+                <button class="btn" id="saveSiteBtn" type="submit">Save settings</button>
+              </div>
+              <p class="form-error" id="siteMsg" role="alert"></p>
+            </form>
+            <p class="note">These settings are read by the live website. Ordering on/off controls whether customers can place orders. Until ordering is switched on, the shop stays in Coming Soon mode.</p>
           </div>
         </section>
 
@@ -469,7 +661,7 @@
         <section class="panel" data-panel="settings" hidden>
           <div class="panel-head">
             <h2>Settings</h2>
-            <p>Business details, appearance and the admin password — everything here is saved in this browser only.</p>
+            <p>Business details, appearance and the admin account. Business details are saved in Firestore, with a copy in this browser as a fallback.</p>
           </div>
           <div class="grid">
             <div class="card">
@@ -496,32 +688,31 @@
               </form>
             </div>
             <div class="card">
-              <h3>Change password</h3>
-              <form class="login-form" id="changePwForm" autocomplete="off" style="margin-top:.4rem;">
-                <label>Current password<input type="password" id="curPw" autocomplete="current-password" /></label>
-                <label>New password<input type="password" id="newPw" autocomplete="new-password" /></label>
-                <label>Confirm new password<input type="password" id="newPw2" autocomplete="new-password" /></label>
-                <p class="form-error" id="changeError" role="alert"></p>
-                <button class="btn" type="submit">Update password</button>
-              </form>
-            </div>
-            <div class="card">
-              <h3>About this gate</h3>
+              <h3>Admin account</h3>
+              <p style="color:var(--ink-soft);font-size:.95rem;margin:.2rem 0 1rem;">The account signed in to this admin page.</p>
               <ul class="plain-list">
-                <li>The password never leaves this browser — only a scrambled fingerprint of it is kept here, never the password itself.</li>
-                <li>Anyone with the website's code could get past a gate like this, so treat it as a lock on a diary, not a safe. The real security is your GitHub, GoDaddy and Zoho sign-ins — keep those strong and private.</li>
-                <li>Forgotten it? Use “Forgot or reset the password” on the sign-in screen to set a new one in this browser.</li>
+                <li><strong>Email</strong><span class="sub" id="adminEmail">—</span></li>
+                <li><strong>Account ID</strong><span class="sub" id="adminUid">—</span></li>
               </ul>
               <div class="form-actions" style="margin-top:1.1rem;">
-                <button class="btn secondary" id="lockBtn2" type="button">Lock this page</button>
+                <button class="btn secondary" id="sendResetBtn" type="button">Send password reset email</button>
               </div>
+              <p class="form-error" id="resetMsg" role="alert" style="margin-top:.8rem;"></p>
+            </div>
+            <div class="card">
+              <h3>About this admin</h3>
+              <ul class="plain-list">
+                <li>Sign-in is by Firebase Authentication — only the EDEN admin account can open this page. Other accounts are signed out automatically.</li>
+                <li>Products, orders, customers, enquiries and reports live in Cloud Firestore. The Billing and Letterhead tools work in this browser, and invoices are downloaded to keep.</li>
+                <li>The real security is your Firebase, GitHub, GoDaddy and Zoho sign-ins — keep those strong and private.</li>
+              </ul>
             </div>
           </div>
         </section>
       </main>
 
       <footer class="dash-foot">
-        EDEN Coffee · Admin — this page will sit at <strong>edencoffee.in/admin</strong>. Developed and designed by <a href="https://www.instagram.com/fidelcastro____?srtk=bjdyOGdlcHo1ejg5" target="_blank" rel="noopener">Fidel Castro</a>.
+        EDEN Coffee · Admin — edencoffee.in/admin
       </footer>
     </div>
 
@@ -531,17 +722,35 @@
     (function(){
       "use strict";
       var $ = function(id){ return document.getElementById(id); };
+
+      /* ---------- Firebase ---------- */
+      var firebaseConfig = {
+        apiKey: "AIzaSyAye_D6h3UQMR8s4osmW8vHKHg96ez0Qe8",
+        authDomain: "eden-coffee.firebaseapp.com",
+        projectId: "eden-coffee",
+        storageBucket: "eden-coffee.firebasestorage.app",
+        messagingSenderId: "152778837716",
+        appId: "1:152778837716:web:aa77e7b3abc7c0335d3541"
+      };
+      var OWNER_UID = "x9CBcFGjc8fWay6kapFTm8HPGCs2";
+      if (!window.firebase) {
+        $("loginError").textContent = "Firebase could not load. Check your connection and reload.";
+        return;
+      }
+      firebase.initializeApp(firebaseConfig);
+      var auth = firebase.auth();
+      var db = firebase.firestore();
+
       var store = {
         get: function(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } },
         set: function(k,v){ try { window.localStorage.setItem(k,v); } catch(e){} },
         del: function(k){ try { window.localStorage.removeItem(k); } catch(e){} }
       };
-      var PW_KEY = "edenAdminPwHash";
       var THEME_KEY = "edenAdminTheme";
       var BIZ_KEY = "edenAdminBiz";
       var BIZ_DEFAULTS = {
         addr: "Nellore, Andhra Pradesh, India",
-        email: "hello@edencoffee.in",
+        email: "anandbabu@edencoffee.in",
         phone: "+252 657366648",
         gstin: "",
         gstPct: 0,
@@ -601,6 +810,21 @@
         $("qlEmail").href = "mailto:" + biz.email;
         $("qlEmailUrl").textContent = biz.email;
       }
+      function loadBizFromFirestore(){
+        return db.collection("settings").doc("business").get().then(function(snap){
+          if (!snap.exists) return;
+          var d = snap.data() || {}, k, changed = false;
+          for (k in BIZ_DEFAULTS){
+            if (typeof d[k] !== "undefined" && d[k] !== null && d[k] !== ""){ biz[k] = d[k]; changed = true; }
+          }
+          if (changed){
+            store.set(BIZ_KEY, JSON.stringify(biz));
+            applyBiz(false);
+            renderInvoice();
+            renderLetter();
+          }
+        }).catch(function(){ /* keep the local copy — Firestore rules may not allow it yet */ });
+      }
       $("bizForm").addEventListener("submit", function(ev){
         ev.preventDefault();
         biz = {
@@ -616,8 +840,14 @@
         applyBiz(false);
         renderInvoice();
         renderLetter();
-        toast("Business details saved.");
+        db.collection("settings").doc("business").set(biz, { merge: true }).then(function(){
+          toast("Business details saved.");
+        }).catch(function(err){
+          toast("Saved in this browser only — Firestore write failed (" + (err && err.code ? err.code : "error") + ").");
+        });
       });
+
+      /* ---------- shared helpers ---------- */
       var toastTimer = null;
       function toast(msg){
         var t = $("toast"); t.textContent = msg; t.classList.add("show");
@@ -630,117 +860,11 @@
         });
       }
       function nl2br(s){ return esc(s).replace(/\n/g,"<br>"); }
-
-      /* ---------- password hashing ---------- */
-      function fallbackHash(str){
-        var h1 = 0xdeadbeef, h2 = 0x41c6ce57, i, ch;
-        for (i = 0; i < str.length; i++){
-          ch = str.charCodeAt(i);
-          h1 = Math.imul(h1 ^ ch, 2654435761);
-          h2 = Math.imul(h2 ^ ch, 1597334677);
-        }
-        h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-        h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-        return "x" + (h2 >>> 0).toString(16) + (h1 >>> 0).toString(16);
-      }
-      function hashPw(pw){
-        var salted = "eden-admin::" + pw;
-        if (window.crypto && window.crypto.subtle && window.isSecureContext){
-          return window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(salted)).then(function(buf){
-            var bytes = new Uint8Array(buf), hex = "";
-            for (var i = 0; i < bytes.length; i++) hex += ("0" + bytes[i].toString(16)).slice(-2);
-            return "s" + hex;
-          }).catch(function(){ return fallbackHash(salted); });
-        }
-        return Promise.resolve(fallbackHash(salted));
-      }
-
-      /* ---------- login ---------- */
-      var loginView = $("loginView"), dashView = $("dashView");
-      function isSetup(){ return !store.get(PW_KEY); }
-      function paintLogin(){
-        var setup = isSetup();
-        $("loginTitle").textContent = setup ? "Set your admin password" : "Admin sign in";
-        $("loginHint").textContent = setup
-          ? "First time here: choose the password for this page. It is kept only in this browser — nothing is sent anywhere."
-          : "Enter the admin password for this page.";
-        $("loginBtn").textContent = setup ? "Set password & enter" : "Sign in";
-        $("pwConfirmWrap").hidden = !setup;
-        $("resetToggle").hidden = setup;
-        $("resetBox").hidden = true;
-        $("loginError").textContent = "";
-        $("pwInput").value = ""; $("pwConfirm").value = "";
-      }
-      function unlock(){
-        loginView.hidden = true; dashView.hidden = false;
-        window.scrollTo(0,0);
-      }
-      function lock(){
-        dashView.hidden = true; loginView.hidden = false;
-        paintLogin();
-        window.scrollTo(0,0);
-      }
-      $("loginForm").addEventListener("submit", function(ev){
-        ev.preventDefault();
-        var pw = $("pwInput").value, err = $("loginError");
-        if (isSetup()){
-          if (pw.length < 6){ err.textContent = "Use at least 6 characters."; return; }
-          if (pw !== $("pwConfirm").value){ err.textContent = "The two passwords don't match."; return; }
-          hashPw(pw).then(function(h){
-            store.set(PW_KEY, h);
-            toast("Password set. Welcome to EDEN Coffee Admin.");
-            unlock();
-          });
-        } else {
-          hashPw(pw).then(function(h){
-            if (h === store.get(PW_KEY)){ err.textContent = ""; unlock(); }
-            else { err.textContent = "That password doesn't match. Try again."; }
-          });
-        }
-      });
-      $("resetToggle").addEventListener("click", function(){ $("resetBox").hidden = !$("resetBox").hidden; });
-      $("resetCancel").addEventListener("click", function(){ $("resetBox").hidden = true; });
-      $("resetConfirm").addEventListener("click", function(){
-        store.del(PW_KEY); paintLogin();
-        toast("Password cleared. Set a new one to continue.");
-      });
-      $("lockBtn").addEventListener("click", lock);
-      $("lockBtn2").addEventListener("click", lock);
-
-      /* ---------- change password ---------- */
-      $("changePwForm").addEventListener("submit", function(ev){
-        ev.preventDefault();
-        var err = $("changeError"), cur = $("curPw").value, nw = $("newPw").value;
-        hashPw(cur).then(function(h){
-          if (h !== store.get(PW_KEY)){ err.textContent = "Current password doesn't match."; return; }
-          if (nw.length < 6){ err.textContent = "New password needs at least 6 characters."; return; }
-          if (nw !== $("newPw2").value){ err.textContent = "The new passwords don't match."; return; }
-          hashPw(nw).then(function(h2){
-            store.set(PW_KEY, h2);
-            err.textContent = "";
-            $("curPw").value = $("newPw").value = $("newPw2").value = "";
-            toast("Password updated.");
-          });
-        });
-      });
-
-      /* ---------- tabs ---------- */
-      var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
-      var panels = Array.prototype.slice.call(document.querySelectorAll(".panel"));
-      tabs.forEach(function(tab){
-        tab.addEventListener("click", function(){
-          tabs.forEach(function(t){ t.setAttribute("aria-selected", t === tab ? "true" : "false"); });
-          panels.forEach(function(p){ p.hidden = p.getAttribute("data-panel") !== tab.getAttribute("data-tab"); });
-          window.scrollTo(0,0);
-        });
-      });
-
-      /* ---------- shared doc helpers ---------- */
       var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
       function fmtDate(iso){
         if (!iso) return "";
-        var p = iso.split("-");
-        if (p.length !== 3) return iso;
+        var p = String(iso).split("-");
+        if (p.length !== 3) return String(iso);
         return parseInt(p[2],10) + " " + (MONTHS[parseInt(p[1],10)-1] || "") + " " + p[0];
       }
       function todayISO(){
@@ -750,6 +874,729 @@
       function money(n){
         return "₹" + (Math.round(n * 100) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
+      function tsToDate(v){
+        if (!v) return null;
+        if (v.toDate){ try { return v.toDate(); } catch(e){ return null; } }
+        if (typeof v === "object" && typeof v.seconds === "number") return new Date(v.seconds * 1000);
+        if (typeof v === "string" || typeof v === "number"){
+          var d = new Date(v);
+          return isNaN(d.getTime()) ? null : d;
+        }
+        return null;
+      }
+      function fmtDateTime(d){
+        if (!d) return "—";
+        var h = d.getHours(), m = d.getMinutes();
+        var ampm = h >= 12 ? "PM" : "AM";
+        h = h % 12; if (h === 0) h = 12;
+        return d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear() + ", " + h + ":" + ("0"+m).slice(-2) + " " + ampm;
+      }
+      function loadError(el, err, what){
+        var msg = "Could not load " + what + ".";
+        if (err && err.code) msg += " (" + err.code + ")";
+        msg += " Check the Firestore rules and try Refresh.";
+        el.innerHTML = '<p class="err-msg">' + esc(msg) + "</p>";
+      }
+      function loading(el, msg){
+        el.innerHTML = '<p class="empty-msg">' + esc(msg || "Loading…") + "</p>";
+      }
+
+      /* ---------- auth ---------- */
+      var loginView = $("loginView"), dashView = $("dashView");
+      var dashShown = false;
+      function showLogin(){
+        dashView.hidden = true; loginView.hidden = false;
+        dashShown = false;
+        window.scrollTo(0,0);
+      }
+      function showDash(){
+        loginView.hidden = true; dashView.hidden = false;
+        dashShown = true;
+        window.scrollTo(0,0);
+        var u = auth.currentUser;
+        if (u){
+          $("adminEmail").textContent = u.email || "—";
+          $("adminUid").textContent = u.uid || "—";
+        }
+      }
+      function authErrorText(err){
+        if (!err) return "Sign-in failed. Try again.";
+        switch (err.code){
+          case "auth/invalid-email": return "That email address doesn't look right.";
+          case "auth/user-not-found": return "No account with that email. Check the email and try again.";
+          case "auth/wrong-password": return "Wrong password. Try again, or use Forgot password.";
+          case "auth/invalid-credential": return "Email or password doesn't match. Try again, or use Forgot password.";
+          case "auth/too-many-requests": return "Too many attempts — wait a little and try again.";
+          case "auth/popup-closed-by-user": return "The Google sign-in window was closed. Try again.";
+          case "auth/network-request-failed": return "Network problem — check your connection and try again.";
+          default: return "Sign-in failed" + (err.message ? ": " + err.message : ".");
+        }
+      }
+      $("loginForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var email = $("loginEmail").value.trim();
+        var pw = $("loginPw").value;
+        var err = $("loginError");
+        if (!email || !pw){ err.textContent = "Enter your email and password."; return; }
+        err.textContent = "";
+        $("loginBtn").disabled = true;
+        auth.signInWithEmailAndPassword(email, pw).then(function(){
+          /* onAuthStateChanged decides */
+        }).catch(function(e){
+          err.textContent = authErrorText(e);
+        }).finally(function(){
+          $("loginBtn").disabled = false;
+        });
+      });
+      $("googleBtn").addEventListener("click", function(){
+        $("loginError").textContent = "";
+        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){
+          $("loginError").textContent = authErrorText(e);
+        });
+      });
+      $("forgotBtn").addEventListener("click", function(){
+        var email = $("loginEmail").value.trim();
+        var err = $("loginError");
+        if (!email){ err.textContent = "Enter your email above first, then tap Forgot password."; return; }
+        err.textContent = "";
+        auth.sendPasswordResetEmail(email).then(function(){
+          err.textContent = "";
+          toast("Password reset email sent to " + email + ".");
+        }).catch(function(e){
+          err.textContent = authErrorText(e);
+        });
+      });
+      $("signOutBtn").addEventListener("click", function(){
+        auth.signOut();
+      });
+      var nonOwnerShown = false;
+      auth.onAuthStateChanged(function(user){
+        if (user && user.uid === OWNER_UID){
+          nonOwnerShown = false;
+          showDash();
+          loadBizFromFirestore();
+          if (!dashLoaded) loadDashboard();
+        } else if (user){
+          if (!nonOwnerShown){
+            nonOwnerShown = true;
+            auth.signOut().then(function(){
+              $("loginError").textContent = "This account is not the EDEN admin.";
+            });
+          }
+          showLogin();
+        } else {
+          showLogin();
+        }
+      });
+
+      /* ---------- tabs ---------- */
+      var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+      var panels = Array.prototype.slice.call(document.querySelectorAll(".panel"));
+      var tabLoaders = {
+        dashboard: loadDashboard,
+        products: loadProducts,
+        orders: loadOrders,
+        customers: loadCustomers,
+        reports: loadReports,
+        enquiries: loadEnquiries,
+        content: loadSiteSettings,
+        billing: null,
+        letterhead: null,
+        settings: null
+      };
+      function switchTab(name){
+        tabs.forEach(function(t){ t.setAttribute("aria-selected", t.getAttribute("data-tab") === name ? "true" : "false"); });
+        panels.forEach(function(p){ p.hidden = p.getAttribute("data-panel") !== name; });
+        window.scrollTo(0,0);
+        var loader = tabLoaders[name];
+        if (loader) loader();
+      }
+      tabs.forEach(function(tab){
+        tab.addEventListener("click", function(){ switchTab(tab.getAttribute("data-tab")); });
+      });
+      $("viewAllOrdersBtn").addEventListener("click", function(){ switchTab("orders"); });
+
+      /* ---------- Firestore shape helpers ---------- */
+      function orderItems(o){
+        var raw = Array.isArray(o.items) ? o.items : [];
+        return raw.map(function(i){
+          i = i || {};
+          return {
+            name: i.name || i.productName || i.title || i.id || "Item",
+            qty: (typeof i.qty === "number" ? i.qty : (typeof i.quantity === "number" ? i.quantity : 1)),
+            price: (typeof i.price === "number" ? i.price : (typeof i.rate === "number" ? i.rate : 0)),
+            size: i.size || i.variant || ""
+          };
+        });
+      }
+      function orderTotal(o){
+        if (typeof o.total === "number") return o.total;
+        if (typeof o.grandTotal === "number") return o.grandTotal;
+        if (typeof o.amount === "number") return o.amount;
+        var s = 0;
+        orderItems(o).forEach(function(i){ s += (i.qty || 0) * (i.price || 0); });
+        return s;
+      }
+      function orderDate(o){
+        return tsToDate(o.createdAt) || tsToDate(o.date) || tsToDate(o.orderedAt);
+      }
+      function orderCustomer(o){
+        if (o.customerName) return o.customerName;
+        if (o.name) return o.name;
+        if (o.customer && o.customer.name) return o.customer.name;
+        if (o.email) return o.email;
+        return "—";
+      }
+      function orderStatus(o){ return o.status || "Placed"; }
+      function addrLines(a){
+        if (!a) return [];
+        if (typeof a === "string") return a.split("\n").map(function(x){ return x.trim(); }).filter(Boolean);
+        var keys = ["dno", "dNo", "street", "landmark", "area", "city", "state", "pincode", "pin"];
+        var out = [];
+        keys.forEach(function(k){
+          if (a[k]) out.push(String(a[k]));
+        });
+        if (!out.length){
+          Object.keys(a).forEach(function(k){
+            var v = a[k];
+            if (typeof v === "string" || typeof v === "number") out.push(String(v));
+          });
+        }
+        return out;
+      }
+      function shortId(id){
+        id = String(id || "");
+        return id.length > 14 ? id.slice(0, 8) + "…" + id.slice(-4) : id;
+      }
+
+      /* ---------- Dashboard ---------- */
+      var dashLoaded = false;
+      function loadDashboard(){
+        dashLoaded = true;
+        var errBox = $("dashError");
+        errBox.innerHTML = "";
+        $("recentOrders").innerHTML = '<p class="empty-msg">Loading…</p>';
+        Promise.all([
+          db.collection("users").get(),
+          db.collection("orders").get(),
+          db.collection("products").get()
+        ]).then(function(res){
+          var usersSnap = res[0], ordersSnap = res[1], productsSnap = res[2];
+          $("statCustomers").textContent = usersSnap.size;
+          $("statOrders").textContent = ordersSnap.size;
+          var revenue = 0, orders = [];
+          ordersSnap.forEach(function(doc){
+            var o = doc.data() || {}; o._id = doc.id;
+            revenue += orderTotal(o);
+            orders.push(o);
+          });
+          $("statRevenue").textContent = money(revenue);
+          $("statProducts").textContent = productsSnap.size;
+          orders.sort(function(a, b){
+            var da = orderDate(a), dbb = orderDate(b);
+            return (dbb ? dbb.getTime() : 0) - (da ? da.getTime() : 0);
+          });
+          var recent = orders.slice(0, 5);
+          if (!recent.length){
+            $("recentOrders").innerHTML = '<p class="empty-msg">No orders yet — ordering opens at launch.</p>';
+            return;
+          }
+          var html = '<div class="table-scroll"><table class="data-table"><thead><tr><th>Order</th><th>Date</th><th>Customer</th><th class="num">Total</th><th>Status</th></tr></thead><tbody>';
+          recent.forEach(function(o){
+            html += "<tr><td>" + esc(shortId(o._id)) + "</td><td>" + esc(fmtDateTime(orderDate(o))) + "</td><td>" + esc(orderCustomer(o)) +
+              '</td><td class="num">' + esc(money(orderTotal(o))) + "</td><td>" + esc(orderStatus(o)) + "</td></tr>";
+          });
+          html += "</tbody></table></div>";
+          $("recentOrders").innerHTML = html;
+        }).catch(function(err){
+          $("statCustomers").textContent = "—";
+          $("statOrders").textContent = "—";
+          $("statRevenue").textContent = "—";
+          $("statProducts").textContent = "—";
+          loadError(errBox, err, "the dashboard numbers");
+          $("recentOrders").innerHTML = '<p class="empty-msg">Could not load recent orders.</p>';
+        });
+      }
+      $("refreshDashboard").addEventListener("click", loadDashboard);
+
+      /* ---------- Products ---------- */
+      var SEED_PRODUCTS = [
+        { id: "daily-classic", col: "EDEN Daily", name: "Daily Classic", form: "South Indian Filter Coffee Powder", blend: "80% Coffee · 20% Chicory", sizes: ["100g","250g","500g","1kg"], prices: [99,199,379,699], desc: "EDEN's everyday filter coffee — 80% coffee, 20% chicory, ground for the South Indian filter. Balanced and familiar, with the thick decoction that takes milk and a little jaggery the way it should.", brew: "Brew it in a traditional South Indian filter: two heaped tablespoons per cup, water just off the boil, ten patient minutes.", active: true },
+        { id: "daily-strong", col: "EDEN Daily", name: "Daily Strong", form: "South Indian Filter Coffee Powder", blend: "70% Coffee · 30% Chicory", sizes: ["100g","250g","500g","1kg"], prices: [89,179,339,629], desc: "More chicory, more body. A darker, stronger decoction for mornings that need a firmer start — the blend for those who like their filter coffee with backbone.", brew: "Brew it in a traditional South Indian filter: two heaped tablespoons per cup, water just off the boil, ten patient minutes.", active: true },
+        { id: "daily-pure", col: "EDEN Daily", name: "Daily Pure", form: "South Indian Filter Coffee Powder", blend: "100% Coffee · No Chicory", sizes: ["100g","250g","500g","1kg"], prices: [129,249,479,899], desc: "Nothing but coffee — no chicory, no shortcuts. A clean, full coffee flavour for purists, ground fine for the filter and just as happy in a moka pot.", brew: "Brew it in a traditional South Indian filter, or a moka pot: two heaped tablespoons per cup, water just off the boil.", active: true },
+        { id: "reserve-arabica", col: "EDEN Reserve", name: "Reserve Arabica", form: "Whole Beans · Also Ground as Powder", blend: "100% Arabica", sizes: ["100g","250g","500g"], prices: [279,599,1149], desc: "100% arabica, roasted in small batches and rested before packing. Smooth and aromatic — take it as whole beans for your own grinder, or ground as powder, ready to brew.", brew: "Grind just before brewing if you can: 18 g for a 300 ml pour-over, water at about 93°C, slow circles.", active: true },
+        { id: "reserve-robusta", col: "EDEN Reserve", name: "Reserve Robusta", form: "Whole Beans · Also Ground as Powder", blend: "100% Robusta", sizes: ["100g","250g","500g"], prices: [229,499,949], desc: "100% robusta — bold and full-bodied, with the deep crema robusta is prized for. For espresso drinkers and strong-coffee loyalists who want the cup to push back.", brew: "Built for espresso and the moka pot: a fine grind, a firm tamp, and a short, intense extraction.", active: true },
+        { id: "reserve-premium", col: "EDEN Reserve", name: "Reserve Premium Blend", form: "Whole Beans · Also Ground as Powder", blend: "Arabica · Robusta Blend", sizes: ["100g","250g","500g"], prices: [299,649,1249], desc: "The roaster's balance — arabica's aroma over robusta's body, blended so neither shouts the other down. In beans for your grinder, or ground as powder, ready to brew.", brew: "Equally at home in a pour-over or a moka pot: 18 g for 300 ml, water just off the boil.", active: true }
+      ];
+      function loadProducts(){
+        var list = $("productsList");
+        loading(list);
+        db.collection("products").get().then(function(snap){
+          if (snap.empty){
+            list.innerHTML = '<p class="empty-msg">No products in Firestore yet.</p>' +
+              '<div class="form-actions"><button class="btn" id="seedProductsBtn" type="button">Seed catalogue (6 products)</button></div>' +
+              '<p class="note">This writes the current live catalogue — Daily Classic, Strong and Pure, plus Reserve Arabica, Robusta and Premium Blend — into Firestore.</p>';
+            $("seedProductsBtn").addEventListener("click", seedProducts);
+            return;
+          }
+          var docs = [];
+          snap.forEach(function(doc){ var d = doc.data() || {}; d._id = doc.id; docs.push(d); });
+          docs.sort(function(a, b){ return String(a.col || "").localeCompare(String(b.col || "")) || String(a.name || "").localeCompare(String(b.name || "")); });
+          var html = "";
+          docs.forEach(function(p){
+            var sizes = Array.isArray(p.sizes) ? p.sizes : [];
+            var prices = Array.isArray(p.prices) ? p.prices : [];
+            var active = p.active !== false;
+            html += '<div class="prod-card" data-pid="' + esc(p._id) + '">' +
+              '<h3>' + esc(p.name || p._id) + ' ' + (active ? '<span class="badge ok">Active</span>' : '<span class="badge muted">Hidden</span>') + "</h3>" +
+              '<p class="meta">' + esc(p.col || "—") + " · " + esc(p.form || "—") + " · " + esc(p.blend || "—") + "</p>" +
+              (p.desc ? '<p class="desc">' + esc(p.desc) + "</p>" : "") +
+              '<div class="price-grid">';
+            sizes.forEach(function(sz, i){
+              var pr = (typeof prices[i] === "number") ? prices[i] : "";
+              html += '<div class="field"><label>' + esc(sz) + ' — ₹</label><input class="price-input" data-idx="' + i + '" type="number" min="0" step="1" value="' + esc(pr) + '" inputmode="decimal" /></div>';
+            });
+            html += "</div>" +
+              '<div class="prod-actions"><label class="toggle-row"><input type="checkbox" class="active-toggle"' + (active ? " checked" : "") + ' /> Active (visible on the site)</label>' +
+              '<button class="btn small" type="button" data-save-prod>Save</button></div>' +
+              "</div>";
+          });
+          list.innerHTML = html;
+          Array.prototype.forEach.call(list.querySelectorAll("[data-save-prod]"), function(btn){
+            btn.addEventListener("click", function(){
+              var card = btn.closest(".prod-card");
+              var pid = card.getAttribute("data-pid");
+              var newPrices = [];
+              var ok = true;
+              Array.prototype.forEach.call(card.querySelectorAll(".price-input"), function(inp){
+                var v = parseFloat(inp.value);
+                if (isNaN(v) || v < 0){ ok = false; }
+                newPrices.push(isNaN(v) ? 0 : v);
+              });
+              if (!ok){ toast("Check the prices — each one needs a number, 0 or more."); return; }
+              var active = card.querySelector(".active-toggle").checked;
+              btn.disabled = true;
+              db.collection("products").doc(pid).update({ prices: newPrices, active: active }).then(function(){
+                toast("Saved " + pid + ".");
+                loadProducts();
+              }).catch(function(err){
+                btn.disabled = false;
+                toast("Could not save — " + (err && err.code ? err.code : "error") + ".");
+              });
+            });
+          });
+        }).catch(function(err){
+          loadError(list, err, "the products");
+        });
+      }
+      function seedProducts(){
+        var list = $("productsList");
+        loading(list, "Seeding the catalogue…");
+        var batch = db.batch();
+        SEED_PRODUCTS.forEach(function(p){
+          var ref = db.collection("products").doc(p.id);
+          batch.set(ref, {
+            col: p.col, name: p.name, form: p.form, blend: p.blend,
+            sizes: p.sizes, prices: p.prices, desc: p.desc, brew: p.brew, active: p.active
+          });
+        });
+        batch.commit().then(function(){
+          toast("Catalogue seeded — 6 products.");
+          loadProducts();
+          loadDashboard();
+        }).catch(function(err){
+          loadError(list, err, "seeding the catalogue");
+        });
+      }
+      $("refreshProducts").addEventListener("click", loadProducts);
+      $("addProdForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var msg = $("addProdMsg");
+        msg.textContent = "";
+        var name = $("npName").value.trim();
+        var sizes = $("npSizes").value.split(",").map(function(s){ return s.trim(); }).filter(Boolean);
+        var prices = $("npPrices").value.split(",").map(function(s){ return parseFloat(s.trim()); });
+        if (!name){ msg.textContent = "Give the product a name."; return; }
+        if (!sizes.length){ msg.textContent = "Add at least one size."; return; }
+        if (prices.length !== sizes.length || prices.some(function(p){ return isNaN(p) || p < 0; })){
+          msg.textContent = "Prices must be numbers, one per size, in the same order.";
+          return;
+        }
+        var btn = $("addProdBtn");
+        btn.disabled = true;
+        db.collection("products").add({
+          col: $("npCol").value,
+          name: name,
+          form: $("npForm").value.trim(),
+          blend: $("npBlend").value.trim(),
+          sizes: sizes,
+          prices: prices,
+          desc: $("npDesc").value.trim(),
+          brew: $("npBrew").value.trim(),
+          active: $("npActive").checked
+        }).then(function(){
+          toast("Product added.");
+          $("addProdForm").reset();
+          $("npActive").checked = true;
+          loadProducts();
+        }).catch(function(err){
+          msg.textContent = "Could not add the product — " + (err && err.code ? err.code : "error") + ".";
+        }).finally(function(){
+          btn.disabled = false;
+        });
+      });
+
+      /* ---------- Orders ---------- */
+      var ordersCache = [];
+      function loadOrders(){
+        var list = $("ordersList");
+        $("orderDetail").hidden = true;
+        loading(list);
+        db.collection("orders").get().then(function(snap){
+          ordersCache = [];
+          snap.forEach(function(doc){ var o = doc.data() || {}; o._id = doc.id; ordersCache.push(o); });
+          ordersCache.sort(function(a, b){
+            var da = orderDate(a), dbb = orderDate(b);
+            return (dbb ? dbb.getTime() : 0) - (da ? da.getTime() : 0);
+          });
+          if (!ordersCache.length){
+            list.innerHTML = '<p class="empty-msg">No orders yet — ordering opens at launch.</p>';
+            return;
+          }
+          var html = '<div class="table-scroll"><table class="data-table"><thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Items</th><th class="num">Total</th><th>Status</th></tr></thead><tbody>';
+          ordersCache.forEach(function(o){
+            var items = orderItems(o);
+            var summary = items.map(function(i){ return i.name + (i.size ? " " + i.size : "") + " × " + i.qty; }).join(", ") || "—";
+            html += '<tr class="clickable" data-oid="' + esc(o._id) + '"><td>' + esc(shortId(o._id)) + "</td><td>" + esc(fmtDateTime(orderDate(o))) +
+              "</td><td>" + esc(orderCustomer(o)) + "</td><td>" + esc(summary) + '</td><td class="num">' + esc(money(orderTotal(o))) +
+              "</td><td>" + esc(orderStatus(o)) + "</td></tr>";
+          });
+          html += "</tbody></table></div>";
+          list.innerHTML = html;
+          Array.prototype.forEach.call(list.querySelectorAll("[data-oid]"), function(row){
+            row.addEventListener("click", function(){ showOrderDetail(row.getAttribute("data-oid")); });
+          });
+        }).catch(function(err){
+          loadError(list, err, "the orders");
+        });
+      }
+      function showOrderDetail(oid){
+        var o = null;
+        ordersCache.forEach(function(x){ if (x._id === oid) o = x; });
+        if (!o){ toast("That order is no longer in the list — try Refresh."); return; }
+        $("ordersList").hidden = true;
+        $("orderDetail").hidden = false;
+        $("odTitle").textContent = "Order " + shortId(oid);
+        var items = orderItems(o);
+        var rows = items.map(function(i){
+          return "<tr><td>" + esc(i.name) + (i.size ? " (" + esc(i.size) + ")" : "") + '</td><td class="num">' + i.qty +
+            '</td><td class="num">' + esc(money(i.price)) + '</td><td class="num">' + esc(money(i.qty * i.price)) + "</td></tr>";
+        }).join("") || '<tr><td colspan="4" style="color:rgba(41,26,20,.5);">No items recorded</td></tr>';
+        var addr = addrLines(o.address || (o.customer && o.customer.address));
+        var html =
+          '<div class="kv">' +
+          '<div class="row"><span class="k">Date</span><span class="v">' + esc(fmtDateTime(orderDate(o))) + "</span></div>" +
+          '<div class="row"><span class="k">Customer</span><span class="v">' + esc(orderCustomer(o)) + "</span></div>" +
+          '<div class="row"><span class="k">Contact</span><span class="v">' + esc(o.email || (o.customer && o.customer.email) || o.mobile || (o.customer && o.customer.mobile) || "—") + "</span></div>" +
+          '<div class="row"><span class="k">Deliver to</span><span class="v">' + (addr.length ? addr.map(esc).join("<br>") : "—") + "</span></div>" +
+          '<div class="row"><span class="k">Payment</span><span class="v">' + esc(o.payment || o.paymentMethod || o.payMethod || "—") + "</span></div>" +
+          '<div class="row"><span class="k">Order ID</span><span class="v">' + esc(oid) + "</span></div>" +
+          "</div>" +
+          '<div class="table-scroll" style="margin-top:1rem;"><table class="data-table"><thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Amount</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
+          '<p style="text-align:right;font-size:1.1rem;margin-top:.8rem;"><strong>Total: ' + esc(money(orderTotal(o))) + "</strong></p>" +
+          '<div class="form-grid" style="margin-top:1rem;"><div class="field"><label for="odStatus">Status</label><select id="odStatus">' +
+          ["Placed","Packed","Shipped","Delivered"].map(function(s){
+            return '<option value="' + s + '"' + (orderStatus(o) === s ? " selected" : "") + ">" + s + "</option>";
+          }).join("") +
+          '</select></div></div>' +
+          '<div class="form-actions" style="margin-top:1rem;"><button class="btn" id="odSaveStatus" type="button">Save status</button></div>';
+        $("odBody").innerHTML = html;
+        $("odSaveStatus").addEventListener("click", function(){
+          var st = $("odStatus").value;
+          var btn = $("odSaveStatus");
+          btn.disabled = true;
+          db.collection("orders").doc(oid).update({ status: st }).then(function(){
+            toast("Order status set to " + st + ".");
+            o.status = st;
+            loadOrders();
+          }).catch(function(err){
+            btn.disabled = false;
+            toast("Could not save the status — " + (err && err.code ? err.code : "error") + ".");
+          });
+        });
+        window.scrollTo(0,0);
+      }
+      $("odBack").addEventListener("click", function(){
+        $("orderDetail").hidden = true;
+        $("ordersList").hidden = false;
+      });
+      $("refreshOrders").addEventListener("click", loadOrders);
+
+      /* ---------- Customers ---------- */
+      var customersCache = [];
+      function loadCustomers(){
+        var list = $("customersList");
+        $("customerDetail").hidden = true;
+        loading(list);
+        db.collection("users").get().then(function(snap){
+          customersCache = [];
+          snap.forEach(function(doc){ var u = doc.data() || {}; u._id = doc.id; customersCache.push(u); });
+          customersCache.sort(function(a, b){
+            return String(a.name || a.email || "").localeCompare(String(b.name || b.email || ""));
+          });
+          if (!customersCache.length){
+            list.innerHTML = '<p class="empty-msg">No customers yet.</p>';
+            return;
+          }
+          var html = '<div class="table-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Joined</th><th>Role</th></tr></thead><tbody>';
+          customersCache.forEach(function(u){
+            var isAdmin = u._id === OWNER_UID;
+            html += '<tr class="clickable" data-uid="' + esc(u._id) + '"><td>' + esc(u.name || u.displayName || u.fullName || "—") +
+              "</td><td>" + esc(u.email || "—") + "</td><td>" + esc(u.mobile || u.phone || "—") +
+              "</td><td>" + esc(fmtDateTime(tsToDate(u.createdAt) || tsToDate(u.joinedAt))) +
+              '</td><td>' + (isAdmin ? '<span class="badge admin">Admin</span>' : '<span class="badge">Customer</span>') + "</td></tr>";
+          });
+          html += "</tbody></table></div>";
+          list.innerHTML = html;
+          Array.prototype.forEach.call(list.querySelectorAll("[data-uid]"), function(row){
+            row.addEventListener("click", function(){ showCustomerDetail(row.getAttribute("data-uid")); });
+          });
+        }).catch(function(err){
+          loadError(list, err, "the customers");
+        });
+      }
+      function showCustomerDetail(uid){
+        var u = null;
+        customersCache.forEach(function(x){ if (x._id === uid) u = x; });
+        if (!u){ toast("That customer is no longer in the list — try Refresh."); return; }
+        $("customersList").hidden = true;
+        $("customerDetail").hidden = false;
+        $("cdTitle").textContent = u.name || u.displayName || u.email || "Customer";
+        var isAdmin = uid === OWNER_UID;
+        var addrs = Array.isArray(u.addresses) ? u.addresses : [];
+        var addrHtml = addrs.length ? addrs.map(function(a, i){
+          var lines = addrLines(a);
+          var label = (a.label || a.name || ("Address " + (i + 1)));
+          return "<li><strong>" + esc(label) + (a.isDefault || a.default ? ' <span class="badge ok">Default</span>' : "") + "</strong><span class=\"sub\">" + (lines.length ? lines.map(esc).join("<br>") : "—") + "</span></li>";
+        }).join("") : "<li>No addresses saved.</li>";
+        var html =
+          '<div class="kv">' +
+          '<div class="row"><span class="k">Name</span><span class="v">' + esc(u.name || u.displayName || u.fullName || "—") + "</span></div>" +
+          '<div class="row"><span class="k">Email</span><span class="v">' + esc(u.email || "—") + "</span></div>" +
+          '<div class="row"><span class="k">Mobile</span><span class="v">' + esc(u.mobile || u.phone || "—") + "</span></div>" +
+          '<div class="row"><span class="k">Joined</span><span class="v">' + esc(fmtDateTime(tsToDate(u.createdAt) || tsToDate(u.joinedAt))) + "</span></div>" +
+          '<div class="row"><span class="k">Role</span><span class="v">' + (isAdmin ? '<span class="badge admin">Admin</span>' : '<span class="badge">Customer</span>') + "</span></div>" +
+          '<div class="row"><span class="k">Account ID</span><span class="v">' + esc(uid) + "</span></div>" +
+          "</div>" +
+          '<h3 style="margin-top:1.4rem;">Addresses</h3><ul class="plain-list" style="margin-top:.6rem;">' + addrHtml + "</ul>" +
+          '<h3 style="margin-top:1.4rem;">Their orders</h3><div id="cdOrders"><p class="empty-msg">Loading…</p></div>';
+        $("cdBody").innerHTML = html;
+        db.collection("orders").get().then(function(snap){
+          var mine = [];
+          snap.forEach(function(doc){
+            var o = doc.data() || {};
+            if (o.uid === uid || o.userId === uid || o.email === u.email){ o._id = doc.id; mine.push(o); }
+          });
+          mine.sort(function(a, b){
+            var da = orderDate(a), dbb = orderDate(b);
+            return (dbb ? dbb.getTime() : 0) - (da ? da.getTime() : 0);
+          });
+          var box = $("cdOrders");
+          if (!box) return;
+          if (!mine.length){ box.innerHTML = '<p class="empty-msg">No orders from this customer yet.</p>'; return; }
+          var h = '<div class="table-scroll"><table class="data-table"><thead><tr><th>Order</th><th>Date</th><th class="num">Total</th><th>Status</th></tr></thead><tbody>';
+          mine.forEach(function(o){
+            h += "<tr><td>" + esc(shortId(o._id)) + "</td><td>" + esc(fmtDateTime(orderDate(o))) + '</td><td class="num">' + esc(money(orderTotal(o))) + "</td><td>" + esc(orderStatus(o)) + "</td></tr>";
+          });
+          box.innerHTML = h + "</tbody></table></div>";
+        }).catch(function(){
+          var box = $("cdOrders");
+          if (box) box.innerHTML = '<p class="empty-msg">Could not load their orders.</p>';
+        });
+        window.scrollTo(0,0);
+      }
+      $("cdBack").addEventListener("click", function(){
+        $("customerDetail").hidden = true;
+        $("customersList").hidden = false;
+      });
+      $("refreshCustomers").addEventListener("click", loadCustomers);
+
+      /* ---------- Reports ---------- */
+      function loadReports(){
+        var body = $("reportsBody");
+        loading(body);
+        db.collection("orders").get().then(function(snap){
+          var orders = [];
+          snap.forEach(function(doc){ var o = doc.data() || {}; o._id = doc.id; orders.push(o); });
+          var revenue = 0;
+          var byStatus = {};
+          var best = {};
+          orders.forEach(function(o){
+            revenue += orderTotal(o);
+            var st = orderStatus(o);
+            byStatus[st] = (byStatus[st] || 0) + 1;
+            orderItems(o).forEach(function(i){
+              var key = i.name + (i.size ? " " + i.size : "");
+              best[key] = (best[key] || 0) + (i.qty || 0);
+            });
+          });
+          var aov = orders.length ? revenue / orders.length : 0;
+          var statusRows = Object.keys(byStatus).sort().map(function(s){
+            return "<tr><td>" + esc(s) + '</td><td class="num">' + byStatus[s] + "</td></tr>";
+          }).join("") || '<tr><td colspan="2" style="color:rgba(41,26,20,.5);">No orders yet</td></tr>';
+          var bestArr = Object.keys(best).map(function(k){ return { name: k, qty: best[k] }; });
+          bestArr.sort(function(a, b){ return b.qty - a.qty; });
+          var bestRows = bestArr.slice(0, 10).map(function(b){
+            return "<tr><td>" + esc(b.name) + '</td><td class="num">' + b.qty + "</td></tr>";
+          }).join("") || '<tr><td colspan="2" style="color:rgba(41,26,20,.5);">No sales yet</td></tr>';
+          body.innerHTML =
+            '<div class="stats">' +
+            '<div class="stat"><div class="k">Total revenue</div><div class="v">' + esc(money(revenue)) + '</div><div class="s">All orders</div></div>' +
+            '<div class="stat"><div class="k">Total orders</div><div class="v">' + orders.length + '</div><div class="s">All time</div></div>' +
+            '<div class="stat"><div class="k">Average order value</div><div class="v">' + esc(money(aov)) + '</div><div class="s">Revenue ÷ orders</div></div>' +
+            "</div>" +
+            '<div class="grid"><div class="card"><h3>Orders by status</h3><div class="table-scroll"><table class="data-table"><thead><tr><th>Status</th><th class="num">Orders</th></tr></thead><tbody>' + statusRows + "</tbody></table></div></div>" +
+            '<div class="card"><h3>Best sellers</h3><div class="table-scroll"><table class="data-table"><thead><tr><th>Product</th><th class="num">Qty sold</th></tr></thead><tbody>' + bestRows + "</tbody></table></div></div></div>" +
+            (orders.length ? "" : '<p class="note">No orders yet, so there is nothing to report. These numbers will fill in as soon as the first order comes in.</p>');
+        }).catch(function(err){
+          loadError(body, err, "the reports");
+        });
+      }
+      $("refreshReports").addEventListener("click", loadReports);
+
+      /* ---------- Enquiries ---------- */
+      function loadEnquiries(){
+        var list = $("enquiriesList");
+        loading(list);
+        db.collection("enquiries").get().then(function(snap){
+          var rows = [];
+          snap.forEach(function(doc){ var e = doc.data() || {}; e._id = doc.id; rows.push(e); });
+          rows.sort(function(a, b){
+            var da = tsToDate(a.createdAt), dbb = tsToDate(b.createdAt);
+            return (dbb ? dbb.getTime() : 0) - (da ? da.getTime() : 0);
+          });
+          if (!rows.length){
+            list.innerHTML = '<p class="empty-msg">No enquiries logged yet.</p>';
+            return;
+          }
+          var html = '<div class="table-scroll"><table class="data-table"><thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Message</th><th>Status</th><th></th></tr></thead><tbody>';
+          rows.forEach(function(e){
+            var open = (e.status || "Open") !== "Resolved";
+            html += "<tr><td>" + esc(fmtDateTime(tsToDate(e.createdAt))) + "</td><td>" + esc(e.name || "—") + "</td><td>" + esc(e.contact || "—") +
+              "</td><td>" + esc(e.message || "—") + "</td><td>" + (open ? '<span class="badge">Open</span>' : '<span class="badge ok">Resolved</span>') +
+              '</td><td>' + (open ? '<button class="btn small secondary" type="button" data-resolve="' + esc(e._id) + '">Mark resolved</button>' : "") + "</td></tr>";
+          });
+          html += "</tbody></table></div>";
+          list.innerHTML = html;
+          Array.prototype.forEach.call(list.querySelectorAll("[data-resolve]"), function(btn){
+            btn.addEventListener("click", function(){
+              btn.disabled = true;
+              db.collection("enquiries").doc(btn.getAttribute("data-resolve")).update({ status: "Resolved" }).then(function(){
+                toast("Enquiry marked resolved.");
+                loadEnquiries();
+              }).catch(function(err){
+                btn.disabled = false;
+                toast("Could not update — " + (err && err.code ? err.code : "error") + ".");
+              });
+            });
+          });
+        }).catch(function(err){
+          loadError(list, err, "the enquiries");
+        });
+      }
+      $("refreshEnquiries").addEventListener("click", loadEnquiries);
+      $("addEnqForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var msg = $("addEnqMsg");
+        msg.textContent = "";
+        var name = $("enqName").value.trim();
+        var message = $("enqMsg").value.trim();
+        if (!name){ msg.textContent = "Add the person's name."; return; }
+        if (!message){ msg.textContent = "Add what they asked about."; return; }
+        var btn = $("addEnqBtn");
+        btn.disabled = true;
+        db.collection("enquiries").add({
+          name: name,
+          contact: $("enqContact").value.trim(),
+          message: message,
+          status: "Open",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function(){
+          toast("Enquiry logged.");
+          $("addEnqForm").reset();
+          loadEnquiries();
+        }).catch(function(err){
+          msg.textContent = "Could not add the enquiry — " + (err && err.code ? err.code : "error") + ".";
+        }).finally(function(){
+          btn.disabled = false;
+        });
+      });
+
+      /* ---------- Content (settings/site) ---------- */
+      var SITE_DEFAULTS = {
+        comingSoonHeadline: "",
+        comingSoonMessage: "",
+        orderingEnabled: false,
+        supportWhatsApp: "+252 657366648",
+        supportPhone: "+91 90599 07128",
+        supportEmail: "anandbabu@edencoffee.in"
+      };
+      function loadSiteSettings(){
+        var msg = $("siteMsg");
+        msg.textContent = "";
+        db.collection("settings").doc("site").get().then(function(snap){
+          var d = snap.exists ? (snap.data() || {}) : {};
+          $("siteHeadline").value = d.comingSoonHeadline || SITE_DEFAULTS.comingSoonHeadline;
+          $("siteMessage").value = d.comingSoonMessage || SITE_DEFAULTS.comingSoonMessage;
+          $("siteOrdering").checked = (typeof d.orderingEnabled === "boolean") ? d.orderingEnabled : SITE_DEFAULTS.orderingEnabled;
+          $("siteWa").value = d.supportWhatsApp || SITE_DEFAULTS.supportWhatsApp;
+          $("sitePhone").value = d.supportPhone || SITE_DEFAULTS.supportPhone;
+          $("siteEmail").value = d.supportEmail || SITE_DEFAULTS.supportEmail;
+        }).catch(function(err){
+          msg.textContent = "Could not load the site settings — " + (err && err.code ? err.code : "error") + ". The defaults below are the current live contacts.";
+          $("siteWa").value = SITE_DEFAULTS.supportWhatsApp;
+          $("sitePhone").value = SITE_DEFAULTS.supportPhone;
+          $("siteEmail").value = SITE_DEFAULTS.supportEmail;
+          $("siteOrdering").checked = SITE_DEFAULTS.orderingEnabled;
+        });
+      }
+      $("siteForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var msg = $("siteMsg");
+        msg.textContent = "";
+        var btn = $("saveSiteBtn");
+        btn.disabled = true;
+        db.collection("settings").doc("site").set({
+          comingSoonHeadline: $("siteHeadline").value.trim(),
+          comingSoonMessage: $("siteMessage").value.trim(),
+          orderingEnabled: $("siteOrdering").checked,
+          supportWhatsApp: $("siteWa").value.trim(),
+          supportPhone: $("sitePhone").value.trim(),
+          supportEmail: $("siteEmail").value.trim()
+        }, { merge: true }).then(function(){
+          toast("Site settings saved.");
+        }).catch(function(err){
+          msg.textContent = "Could not save — " + (err && err.code ? err.code : "error") + ".";
+        }).finally(function(){
+          btn.disabled = false;
+        });
+      });
+
+      /* ---------- Settings: admin account ---------- */
+      $("sendResetBtn").addEventListener("click", function(){
+        var u = auth.currentUser;
+        var msg = $("resetMsg");
+        if (!u || !u.email){ msg.textContent = "No admin account is signed in."; return; }
+        msg.textContent = "";
+        auth.sendPasswordResetEmail(u.email).then(function(){
+          msg.textContent = "";
+          toast("Password reset email sent to " + u.email + ".");
+        }).catch(function(e){
+          msg.textContent = authErrorText(e);
+        });
+      });
+
+      /* ---------- shared doc helpers (Billing / Letterhead) ---------- */
       var ONES = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
       var TENS = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
       function twoDigits(n){
@@ -816,7 +1663,7 @@
           '<div class="lh-contact">' + esc(biz.addr) + ' &nbsp;·&nbsp; ' + esc(biz.email) + ' &nbsp;·&nbsp; edencoffee.in &nbsp;·&nbsp; ' + esc(biz.phone) + '</div></div>';
       }
       function letterheadFoot(){
-        return '<div class="lh-foot"><span>EDEN Coffee · edencoffee.in</span><span>hello@edencoffee.in</span><span>Instagram @edencoffeeindia</span></div>';
+        return '<div class="lh-foot"><span>EDEN Coffee · edencoffee.in</span><span>anandbabu@edencoffee.in</span><span>Instagram @edencoffeeindia</span></div>';
       }
       function docShell(title, inner){
         return '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>' + esc(title) +
@@ -1012,7 +1859,6 @@
       renderInvoice();
       renderLetter();
       renderSession();
-      paintLogin();
     })();
     </script>
   </body>
