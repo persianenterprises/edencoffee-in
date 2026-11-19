@@ -1657,7 +1657,7 @@ renderShop("all");
      support numbers in CONTACT. The support email and Coming Soon headline /
      message are stored by the admin but have no matching element on this
      page, so they are not applied here. */
-(function applyRemoteCatalogue(){
+function applyRemoteCatalogue(){
   if(!fbDb) return;
   var db = fbDb;
   db.collection("products").get().then(function(snap){
@@ -1696,7 +1696,7 @@ renderShop("all");
       CONTACT.supportSecond = s.supportPhone.replace(/\D/g, "");
     }
   }).catch(function(){ /* keep LAUNCH + CONTACT as published */ });
-})();
+}
 $$("#shopFilters button").forEach(b=> b.addEventListener("click", ()=>{
   $$("#shopFilters button").forEach(x=> x.classList.toggle("on", x===b));
   renderShop(b.dataset.filter);
@@ -2309,6 +2309,10 @@ try {
   fbAuth = firebase.auth();
   fbDb = firebase.firestore();
 } catch(e){ fbAuth = null; fbDb = null; }
+/* Remote catalogue must run AFTER fbDb is declared above: calling it earlier
+   threw "Cannot access 'fbDb' before initialization" and killed this whole
+   script, which silently broke every shop tap, filter, cart and sign-in button. */
+applyRemoteCatalogue();
 if(fbAuth){ try { fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{}); } catch(e){} }
 let authMode = "signin";        /* "signin" | "signup" — base view currently shown */
 let pendingFlow = null;         /* "password" | "verify" while auth is in flight */

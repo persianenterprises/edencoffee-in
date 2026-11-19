@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>EDEN Coffee — Leave a Review</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --cream: #f6f0e5;
+        --cream-card: #fdfaf3;
+        --forest: #173d2b;
+        --forest-deep: #10291d;
+        --gold: #c5a46d;
+        --gold-deep: #a98850;
+        --ink: #22301f;
+        --ink-soft: #55624f;
+        --line: #ddd2bd;
+        --star-empty: #d8cdb4;
+        --field-bg: #ffffff;
+        --shadow: 0 18px 50px rgba(23, 61, 43, 0.14);
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --cream: #0d2318;
+          --cream-card: #14301f;
+          --forest: #f6f0e5;
+          --forest-deep: #f6f0e5;
+          --gold: #c5a46d;
+          --gold-deep: #d9bc85;
+          --ink: #f1ead9;
+          --ink-soft: #b9bfa9;
+          --line: #2c4a38;
+          --star-empty: #3d5c48;
+          --field-bg: #0f2a1c;
+          --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+          color-scheme: dark;
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Jost", system-ui, sans-serif;
+        background: var(--cream);
+        color: var(--ink);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 28px 16px 48px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 460px;
+        background: var(--cream-card);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        padding: 36px 26px 30px;
+        position: relative;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        pointer-events: none;
+      }
+      .card-inner { position: relative; }
+
+      /* ---------- Wordmark ---------- */
+      .wordmark { text-align: center; margin-bottom: 6px; }
+      .wordmark .brand {
+        font-size: 30px;
+        line-height: 1.1;
+        color: var(--forest-deep);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .wordmark .brand .eden {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 700;
+      }
+      .wordmark .brand .coffee {
+        font-family: "Jost", sans-serif;
+        font-weight: 500;
+        font-size: 24px;
+        letter-spacing: 0.3em;
+      }
+      .tagline {
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-weight: 500;
+        font-size: 18px;
+        color: var(--gold-deep);
+        margin-top: 4px;
+      }
+      .rule {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 20px auto 24px;
+        max-width: 220px;
+      }
+      .rule::before, .rule::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--gold);
+        opacity: 0.7;
+      }
+      .rule .diamond {
+        width: 7px; height: 7px;
+        background: var(--gold);
+        transform: rotate(45deg);
+        flex: none;
+      }
+
+      h1 {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 600;
+        font-size: 32px;
+        line-height: 1.15;
+        text-align: center;
+        color: var(--forest-deep);
+        margin: 0 0 8px;
+      }
+      .sub {
+        text-align: center;
+        color: var(--ink-soft);
+        font-size: 15.5px;
+        font-weight: 300;
+        margin: 0 0 26px;
+        line-height: 1.5;
+      }
+
+      /* ---------- Stars ---------- */
+      .stars {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin: 4px 0 6px;
+      }
+      .star-btn {
+        appearance: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        width: 56px;
+        height: 56px;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .star-btn svg {
+        width: 46px; height: 46px;
+        fill: var(--star-empty);
+        transition: fill 0.15s ease, transform 0.15s ease;
+      }
+      .star-btn.filled svg { fill: var(--gold); }
+      .star-btn:active svg { transform: scale(1.15); }
+      .star-btn:focus-visible {
+        outline: 2px solid var(--gold-deep);
+        outline-offset: 2px;
+        border-radius: 6px;
+      }
+      .rating-word {
+        text-align: center;
+        min-height: 24px;
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: 19px;
+        color: var(--gold-deep);
+        margin-bottom: 22px;
+      }
+
+      /* ---------- Fields ---------- */
+      .field-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--forest);
+        margin: 22px 0 10px;
+      }
+      .field-label .opt {
+        font-weight: 300;
+        letter-spacing: 0.04em;
+        text-transform: none;
+        color: var(--ink-soft);
+      }
+
+      .brews {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .brew-chip {
+        appearance: none;
+        font-family: "Jost", sans-serif;
+        font-size: 14.5px;
+        font-weight: 400;
+        color: var(--ink);
+        background: var(--field-bg);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 10px 16px;
+        min-height: 44px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+      }
+      .brew-chip[aria-pressed="true"] {
+        background: var(--forest);
+        border-color: var(--forest);
+        color: var(--cream);
+      }
+      @media (prefers-color-scheme: dark) {
+        .brew-chip[aria-pressed="true"] {
+          background: var(--gold);
+          border-color: var(--gold);
+          color: #10291d;
+        }
+      }
+      .brew-chip:focus-visible {
+        outline: 2px solid var(--gold-deep);
+        outline-offset: 2px;
+      }
+
+      input[type="text"], textarea {
+        width: 100%;
+        font-family: "Jost", sans-serif;
+        font-size: 16px;
+        font-weight: 300;
+        color: var(--ink);
+        background: var(--field-bg);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 12px 14px;
+        min-height: 48px;
+      }
+      textarea { min-height: 96px; resize: vertical; line-height: 1.5; }
+      input[type="text"]:focus, textarea:focus {
+        outline: none;
+        border-color: var(--gold-deep);
+        box-shadow: 0 0 0 3px rgba(197, 164, 109, 0.25);
+      }
+      input::placeholder, textarea::placeholder { color: var(--ink-soft); opacity: 0.75; }
+
+      /* ---------- Buttons ---------- */
+      .submit-btn {
+        width: 100%;
+        margin-top: 28px;
+        appearance: none;
+        border: none;
+        cursor: pointer;
+        font-family: "Jost", sans-serif;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        color: var(--cream);
+        background: var(--forest);
+        border-radius: 4px;
+        padding: 15px 20px;
+        min-height: 54px;
+        transition: opacity 0.15s ease, background 0.15s ease;
+      }
+      @media (prefers-color-scheme: dark) {
+        .submit-btn { background: var(--gold); color: #10291d; }
+      }
+      .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+      .submit-btn:not(:disabled):active { background: var(--forest-deep); }
+      .submit-hint {
+        text-align: center;
+        font-size: 13.5px;
+        color: var(--ink-soft);
+        margin-top: 10px;
+        min-height: 18px;
+      }
+
+      .google-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        margin-top: 14px;
+        font-family: "Jost", sans-serif;
+        font-size: 16.5px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        text-decoration: none;
+        color: var(--forest-deep);
+        background: transparent;
+        border: 1.5px solid var(--gold-deep);
+        border-radius: 4px;
+        padding: 14px 20px;
+        min-height: 54px;
+        cursor: pointer;
+      }
+      .google-btn:active { background: rgba(197, 164, 109, 0.15); }
+      .google-btn.disabled {
+        opacity: 0.55;
+        cursor: default;
+        border-style: dashed;
+      }
+      .google-btn svg { flex: none; }
+
+      .copy-btn, .again-btn {
+        appearance: none;
+        font-family: "Jost", sans-serif;
+        cursor: pointer;
+        border-radius: 4px;
+        min-height: 44px;
+      }
+      .copy-btn {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--cream);
+        background: var(--forest);
+        border: none;
+        padding: 10px 22px;
+        margin-top: 12px;
+      }
+      @media (prefers-color-scheme: dark) {
+        .copy-btn { background: var(--gold); color: #10291d; }
+      }
+      .again-btn {
+        display: block;
+        margin: 22px auto 0;
+        font-size: 14.5px;
+        font-weight: 400;
+        color: var(--ink-soft);
+        background: none;
+        border: none;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        padding: 8px 12px;
+      }
+
+      /* ---------- Thank-you state ---------- */
+      .thanks { text-align: center; display: none; }
+      .thanks.show { display: block; }
+      .thanks .big-stars {
+        font-size: 30px;
+        letter-spacing: 0.18em;
+        color: var(--gold);
+        margin-bottom: 10px;
+      }
+      .thanks h2 {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 600;
+        font-size: 30px;
+        line-height: 1.2;
+        color: var(--forest-deep);
+        margin: 0 0 10px;
+      }
+      .thanks p {
+        color: var(--ink-soft);
+        font-weight: 300;
+        font-size: 16px;
+        line-height: 1.55;
+        margin: 0 0 6px;
+      }
+      .thanks .step-box {
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 18px 16px;
+        margin-top: 20px;
+        background: var(--field-bg);
+      }
+      .thanks .step-box p { margin-bottom: 2px; }
+      .thanks .step-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 21px;
+        font-weight: 600;
+        color: var(--forest-deep);
+        margin: 0 0 4px;
+      }
+      .fallback-box {
+        margin-top: 20px;
+        text-align: left;
+      }
+      .fallback-box .fb-label {
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--forest);
+        margin-bottom: 8px;
+      }
+      .fallback-msg {
+        font-size: 15px;
+        font-weight: 300;
+        line-height: 1.55;
+        background: var(--field-bg);
+        border: 1px dashed var(--gold-deep);
+        border-radius: 4px;
+        padding: 12px 14px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        user-select: all;
+      }
+      .fallback-box .copy-btn { display: block; margin-left: auto; margin-right: auto; }
+      .copied-note {
+        text-align: center;
+        font-size: 13.5px;
+        color: var(--gold-deep);
+        min-height: 18px;
+        margin-top: 8px;
+      }
+
+      .form-wrap.hide { display: none; }
+
+      footer {
+        margin-top: 22px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 300;
+        color: var(--ink-soft);
+        letter-spacing: 0.05em;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="card-inner">
+        <div class="wordmark">
+          <div class="brand"><span class="eden">EDEN</span> <span class="coffee">Coffee</span></div>
+          <div class="tagline">Where Conversations Brew</div>
+        </div>
+        <div class="rule" aria-hidden="true"><span class="diamond"></span></div>
+
+        <!-- ================= Review form ================= -->
+        <div class="form-wrap" id="formWrap">
+          <h1>How was your EDEN coffee?</h1>
+          <p class="sub">Tap the stars, and if you'd like, tell us a little more. Your review comes straight to us.</p>
+
+          <div class="stars" role="radiogroup" aria-label="Your rating">
+            <button type="button" class="star-btn" data-value="1" role="radio" aria-checked="false" aria-label="1 star">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>
+            </button>
+            <button type="button" class="star-btn" data-value="2" role="radio" aria-checked="false" aria-label="2 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>
+            </button>
+            <button type="button" class="star-btn" data-value="3" role="radio" aria-checked="false" aria-label="3 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>
+            </button>
+            <button type="button" class="star-btn" data-value="4" role="radio" aria-checked="false" aria-label="4 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>
+            </button>
+            <button type="button" class="star-btn" data-value="5" role="radio" aria-checked="false" aria-label="5 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>
+            </button>
+          </div>
+          <div class="rating-word" id="ratingWord" aria-live="polite"></div>
+
+          <span class="field-label" id="brewLabel">Your brew <span class="opt">(optional)</span></span>
+          <div class="brews" role="group" aria-labelledby="brewLabel">
+            <button type="button" class="brew-chip" data-brew="South Indian Filter Coffee" aria-pressed="false">South Indian Filter Coffee</button>
+            <button type="button" class="brew-chip" data-brew="Espresso" aria-pressed="false">Espresso</button>
+            <button type="button" class="brew-chip" data-brew="Pour Over" aria-pressed="false">Pour Over</button>
+            <button type="button" class="brew-chip" data-brew="Moka Pot" aria-pressed="false">Moka Pot</button>
+            <button type="button" class="brew-chip" data-brew="French Press" aria-pressed="false">French Press</button>
+          </div>
+
+          <label class="field-label" for="nameInput">Your name <span class="opt">(optional)</span></label>
+          <input type="text" id="nameInput" autocomplete="name" placeholder="e.g. Priya" maxlength="60" />
+
+          <label class="field-label" for="commentInput">Tell us what you loved <span class="opt">(optional)</span></label>
+          <textarea id="commentInput" placeholder="The aroma, the taste, the moment it made…" maxlength="600"></textarea>
+
+          <button type="button" class="submit-btn" id="submitBtn" disabled>Share my review</button>
+          <div class="submit-hint" id="submitHint">Tap the stars above to rate your coffee first.</div>
+        </div>
+
+        <!-- ================= Thank-you state ================= -->
+        <div class="thanks" id="thanksWrap" aria-live="polite">
+          <div class="big-stars" id="thanksStars" aria-hidden="true"></div>
+          <h2 id="thanksHeading">Thank you — your review means the world to us.</h2>
+          <p id="thanksText">We've opened WhatsApp so you can send your review straight to the EDEN Coffee team.</p>
+
+          <!-- Google step: shown only for 4–5 star reviews -->
+          <div class="step-box" id="googleStep" hidden>
+            <p class="step-title">One more tap?</p>
+            <p>Sharing your review on Google helps other coffee lovers find EDEN Coffee.</p>
+            <a class="google-btn" id="googleBtn" href="#" target="_blank" rel="noopener">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.5-.3-2.2H12v4.3h6.5c-.1 1.1-.8 2.7-2.4 3.8l3.7 2.9c2.3-2.1 3.7-5.2 3.7-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.7-2.9c-1 .7-2.4 1.2-4.2 1.2-3.2 0-5.9-2.1-6.8-5l-3.9 3C3.3 21.3 7.3 24 12 24z"/><path fill="#FBBC05" d="M5.2 14.4c-.2-.7-.4-1.5-.4-2.4s.1-1.7.4-2.4l-3.9-3C.5 8.2 0 10 0 12s.5 3.8 1.3 5.4l3.9-3z"/><path fill="#EA4335" d="M12 4.7c1.8 0 3 .8 3.7 1.4l3.3-3.2C17.9 1.1 15.2 0 12 0 7.3 0 3.3 2.7 1.3 6.6l3.9 3c.9-2.8 3.6-4.9 6.8-4.9z"/></svg>
+              <span id="googleBtnText">Share your review on Google</span>
+            </a>
+          </div>
+
+          <!-- Private feedback note: shown only for 1–3 star reviews -->
+          <div class="step-box" id="privateStep" hidden>
+            <p class="step-title">Sorry it wasn't perfect</p>
+            <p>Tell us privately so we can make it right — your message goes only to the EDEN Coffee team on WhatsApp, nowhere public.</p>
+          </div>
+
+          <!-- Fallback if WhatsApp did not open -->
+          <div class="fallback-box">
+            <div class="fb-label">WhatsApp didn't open?</div>
+            <p style="margin:0 0 4px; color:var(--ink-soft); font-weight:300; font-size:15px; line-height:1.5;">
+              Copy your review below and send it to us on WhatsApp at <strong style="font-weight:500;">+91 94414 44715</strong>.
+            </p>
+            <div class="fallback-msg" id="fallbackMsg"></div>
+            <button type="button" class="copy-btn" id="copyBtn">Copy my review</button>
+            <div class="copied-note" id="copiedNote" aria-live="polite"></div>
+          </div>
+
+          <button type="button" class="again-btn" id="againBtn">Write another review</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>EDEN Coffee · Nellore</footer>
+
+    <script>
+      // ============================================================
+      // CONFIG — set this one value when the Google Business Profile exists.
+      // GOOGLE_REVIEW_URL: Set this to the Google Business Profile review
+      // link once the profile is created. While it is empty, the Google
+      // button shows "Google review link coming soon" and stays disabled.
+      // ============================================================
+      var GOOGLE_REVIEW_URL = "";
+
+      var WHATSAPP_NUMBER = "919441444715";
+
+      var rating = 0;
+      var brew = "";
+      var lastMessage = "";
+
+      var starBtns = Array.prototype.slice.call(document.querySelectorAll(".star-btn"));
+      var ratingWord = document.getElementById("ratingWord");
+      var submitBtn = document.getElementById("submitBtn");
+      var submitHint = document.getElementById("submitHint");
+      var ratingWords = {
+        1: "Not quite right this time",
+        2: "Room to improve",
+        3: "Good",
+        4: "Really lovely",
+        5: "Absolutely wonderful"
+      };
+
+      starBtns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          rating = parseInt(btn.getAttribute("data-value"), 10);
+          starBtns.forEach(function (b) {
+            var v = parseInt(b.getAttribute("data-value"), 10);
+            b.classList.toggle("filled", v <= rating);
+            b.setAttribute("aria-checked", v === rating ? "true" : "false");
+          });
+          ratingWord.textContent = ratingWords[rating] || "";
+          submitBtn.disabled = false;
+          submitHint.textContent = rating >= 4
+            ? "Your review goes to us on WhatsApp — and you can share it on Google too."
+            : "Your review goes privately to us on WhatsApp.";
+        });
+      });
+
+      var brewChips = Array.prototype.slice.call(document.querySelectorAll(".brew-chip"));
+      brewChips.forEach(function (chip) {
+        chip.addEventListener("click", function () {
+          var wasSelected = chip.getAttribute("aria-pressed") === "true";
+          brewChips.forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
+          if (wasSelected) {
+            brew = "";
+          } else {
+            chip.setAttribute("aria-pressed", "true");
+            brew = chip.getAttribute("data-brew");
+          }
+        });
+      });
+
+      function starString(n) {
+        var s = "";
+        for (var i = 0; i < 5; i++) s += i < n ? "★" : "☆";
+        return s;
+      }
+
+      function buildMessage() {
+        var name = document.getElementById("nameInput").value.trim();
+        var comment = document.getElementById("commentInput").value.trim();
+        var msg = "Hello EDEN Coffee! I rate my coffee " + starString(rating) + " (" + rating + "/5)";
+        if (brew) msg += " — " + brew;
+        msg += ".";
+        if (name && comment) msg += " — " + name + ": " + comment;
+        else if (name) msg += " — " + name;
+        else if (comment) msg += " " + comment;
+        return msg;
+      }
+
+      submitBtn.addEventListener("click", function () {
+        if (rating === 0) return;
+        lastMessage = buildMessage();
+        var waUrl = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(lastMessage);
+
+        // Show the thank-you state first, then hand off to WhatsApp.
+        document.getElementById("formWrap").classList.add("hide");
+        var thanks = document.getElementById("thanksWrap");
+        thanks.classList.add("show");
+        document.getElementById("thanksStars").textContent = starString(rating);
+        document.getElementById("fallbackMsg").textContent = lastMessage;
+
+        if (rating >= 4) {
+          document.getElementById("thanksHeading").textContent =
+            "Thank you — your review means the world to us.";
+          document.getElementById("thanksText").textContent =
+            "We've opened WhatsApp so you can send your review straight to the EDEN Coffee team.";
+          var googleStep = document.getElementById("googleStep");
+          googleStep.hidden = false;
+          var googleBtn = document.getElementById("googleBtn");
+          var googleBtnText = document.getElementById("googleBtnText");
+          if (GOOGLE_REVIEW_URL) {
+            googleBtn.setAttribute("href", GOOGLE_REVIEW_URL);
+            googleBtn.classList.remove("disabled");
+            googleBtn.removeAttribute("aria-disabled");
+            googleBtnText.textContent = "Share your review on Google";
+          } else {
+            googleBtn.removeAttribute("href");
+            googleBtn.classList.add("disabled");
+            googleBtn.setAttribute("aria-disabled", "true");
+            googleBtnText.textContent = "Google review link coming soon";
+          }
+        } else {
+          document.getElementById("thanksHeading").textContent =
+            "Sorry it wasn't perfect — tell us privately so we can make it right.";
+          document.getElementById("thanksText").textContent =
+            "Thank you for telling us honestly. We've opened WhatsApp so your feedback comes straight to the EDEN Coffee team — and only to us.";
+          document.getElementById("privateStep").hidden = false;
+        }
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        // Open WhatsApp with the prefilled review. If the hand-off is
+        // blocked, the fallback box above carries the same message with
+        // a copy button, so nothing is ever silently lost.
+        window.open(waUrl, "_blank");
+      });
+
+      document.getElementById("copyBtn").addEventListener("click", function () {
+        var note = document.getElementById("copiedNote");
+        function done() { note.textContent = "Copied — paste it into WhatsApp and send."; }
+        function failed() {
+          note.textContent = "Press and hold the message above to copy it.";
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(lastMessage).then(done, function () {
+            legacyCopy() ? done() : failed();
+          });
+        } else {
+          legacyCopy() ? done() : failed();
+        }
+      });
+
+      function legacyCopy() {
+        try {
+          var ta = document.createElement("textarea");
+          ta.value = lastMessage;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          return ok;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      document.getElementById("againBtn").addEventListener("click", function () {
+        document.getElementById("thanksWrap").classList.remove("show");
+        document.getElementById("googleStep").hidden = true;
+        document.getElementById("privateStep").hidden = true;
+        document.getElementById("formWrap").classList.remove("hide");
+        document.getElementById("copiedNote").textContent = "";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    </script>
+  </body>
+</html>
