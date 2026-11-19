@@ -1030,6 +1030,9 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
         <div id="signupDupBox" class="auth-ok-box" hidden>
           <p>An account with this email already exists — please sign in instead. <button type="button" class="linklike" id="dupGoSignIn">Sign in</button></p>
         </div>
+        <div id="signupMobileDupBox" class="auth-ok-box" hidden>
+          <p>This mobile number is already registered — please sign in. <button type="button" class="linklike" id="mobileDupGoSignIn">Sign in</button></p>
+        </div>
         <p class="auth-foot-switch">Already have an account? <button type="button" class="linklike" id="switchToSignIn">Sign in</button></p>
       </div>
       <!-- CHECK YOUR EMAIL — shown after Firebase creates the account
@@ -1396,10 +1399,18 @@ async function openCashfreeCheckout(paymentSessionId){
    completed with confirmPasswordReset. For now both mails come from
    Firebase's own sender (noreply@eden-coffee.firebaseapp.com); they
    move to no-reply@edencoffee.in when the backend is built later.
-   KNOWN LIMITATION: duplicate mobile-number prevention cannot be
-   enforced with Firebase client-side auth alone (no backend) — two
-   accounts could register the same mobile. Duplicate EMAILS are
-   enforced by Firebase itself (auth/email-already-in-use). */
+   MOBILE UNIQUENESS: each mobile number may have exactly ONE
+   account — the same rule as email. It is enforced with the
+   Firestore `mobileNumbers` lookup collection plus rules (see
+   mobileKey / mobileTakenByOther / claimMobile below): the mobile is
+   checked BEFORE the Auth user is created, and claimed immediately
+   after creation; the rules refuse a claim when the document already
+   exists, so a race cannot create two accounts with one mobile. If
+   the claim fails, the just-created Auth user is deleted and signup
+   is refused. Duplicate EMAILS are enforced by Firebase itself
+   (auth/email-already-in-use). Mobile numbers are format-validated,
+   NOT OTP-verified — this stops one mobile having many accounts; it
+   does not prove the customer owns the number. */
 const FIREBASE_ACTION_SETTINGS = { url: "https://edencoffee.in", handleCodeInApp: true };
 let evState = { email: "", name: "", mobile: "", countryCode: "+91" };
 let resetState = { oobCode: "" };
@@ -2323,6 +2334,68 @@ function validMobileFor(m, cc){
   return /^\d{6,12}$/.test(d);
 }
 function validMobile(m){ return validMobileFor(m, "+91"); }
+/* ---------------- mobile-number uniqueness ----------------
+   One mobile number = one account, same as email. The lookup key is
+   the normalised mobile: for +91 the 10-digit number (so
+   "+91 98765 43210", "09876543210" and "9876543210" are the SAME
+   number); for other country codes the country-code digits are
+   prefixed, so two countries can never collide on the same digit
+   string. The lookup lives in Firestore `mobileNumbers/{key}` with
+   {uid, email, createdAt}. The page checks it BEFORE creating the
+   Auth user, and claims it immediately after creation. The Firestore
+   rules refuse a claim when the document already exists, so a race
+   between the check and the claim cannot create two accounts with
+   one mobile — the claim fails and the just-created Auth user is
+   deleted. NOTE: the lookup is readable before sign-in (the signup
+   page must check it), so whether a mobile is registered becomes
+   discoverable — the same trade-off as email enumeration. The
+   message never names the other account. Mobile numbers are
+   format-validated, NOT OTP-verified. */
+function mobileKey(m, cc){
+  const d = normMobileFor(m, cc);
+  if((cc || "+91") === "+91") return d;
+  return String(cc || "").replace(/\D/g, "") + "-" + d;
+}
+async function mobileClaimFor(key){
+  const snap = await fbDb.collection("mobileNumbers").doc(key).get();
+  return snap.exists ? (snap.data() || {}) : null;
+}
+/* True when the mobile is already claimed by a DIFFERENT account.
+   uid may be null (registration, no account yet) — then any existing
+   claim counts. A claim by the SAME uid is fine (e.g. finishing a
+   profile whose mobile was already claimed at registration). */
+async function mobileTakenByOther(key, uid){
+  const claim = await mobileClaimFor(key);
+  if(!claim) return false;
+  return uid ? claim.uid !== uid : true;
+}
+/* Claim a mobile for an account. Returns true when the claim is
+   ours (already claimed by us, or newly created). Returns false when
+   the mobile belongs to someone else or the claim write was refused
+   (the rules refuse a create when the document already exists). A
+   read error propagates to the caller — it must NOT be treated as
+   "free", or a failed check would silently let a duplicate through. */
+async function claimMobile(key, uid, email){
+  if(!fbDb) return false;
+  const claim = await mobileClaimFor(key);
+  if(claim) return claim.uid === uid;
+  try {
+    await fbDb.collection("mobileNumbers").doc(key).set({ uid: uid, email: email || "", createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    return true;
+  } catch(e){ return false; }
+}
+/* Release a mobile claim, but ONLY when the caller owns it — never
+   delete another account's claim (a grandfathered duplicate's old
+   number must stay claimed by its owner). Failures are silent: a
+   stale claim only blocks that number until an admin removes it. */
+async function releaseMobileIfOurs(key, uid){
+  if(!fbDb || !key || !uid) return;
+  try {
+    const snap = await fbDb.collection("mobileNumbers").doc(key).get();
+    if(snap.exists && (snap.data() || {}).uid === uid) await fbDb.collection("mobileNumbers").doc(key).delete();
+  } catch(e){}
+}
+const MOBILE_DUP_MSG = "This mobile number is already registered — please sign in.";
 function checkDetails(name, mobile, cc){
   if(!name || name.trim().length < 2) return "Please enter your full name.";
   if(!validMobileFor(mobile, cc || "+91")) return (cc && cc !== "+91") ? "Please enter a valid mobile number for the selected country." : "Please enter a valid 10-digit Indian mobile number.";
@@ -2339,7 +2412,7 @@ function clearAuthMessages(){
   ["authErrSignIn","regErr","detailsErr","forgotErr","resetPwErr","resetPwOk","checkEmailErr","checkEmailOk","verifyStatusErr","verifyStatusOk","changeEmailErr","unverifiedOk"].forEach(id=>{
     const el = document.getElementById(id); if(el) el.textContent = "";
   });
-  ["notRegisteredBox","unverifiedBox","signupDupBox","forgotOk","forgotNotRegBox","changeEmailWrap"].forEach(id=>{
+  ["notRegisteredBox","unverifiedBox","signupDupBox","signupMobileDupBox","forgotOk","forgotNotRegBox","changeEmailWrap"].forEach(id=>{
     const el = document.getElementById(id); if(el) el.hidden = true;
   });
 }
@@ -2386,7 +2459,7 @@ function openAuth(mode){
   if(mode !== "signup" && !AUTH.customer_login_enabled){ showToast("Sign-in opens at brand launch."); return; }
   authMode = mode || "signin";
   ["#authErrSignIn","#regErr","#detailsErr","#forgotErr","#resetPwErr"].forEach(sel=>{ const el = $(sel); if(el) el.textContent = ""; });
-  ["#signupDupBox","#forgotOk","#forgotNotRegBox","#notRegisteredBox","#unverifiedBox"].forEach(sel=>{ const el = $(sel); if(el) el.hidden = true; });
+  ["#signupDupBox","#signupMobileDupBox","#forgotOk","#forgotNotRegBox","#notRegisteredBox","#unverifiedBox"].forEach(sel=>{ const el = $(sel); if(el) el.hidden = true; });
   showAuthViews();
   openModal("authModal");
 }
@@ -2626,21 +2699,26 @@ async function handlePasswordSignIn(){
 }
 /* ---------------- Registration — Firebase built-in flow ----------------
    Registration form (name + mobile + email + password) ->
-   createUserWithEmailAndPassword -> profile saved once to Firestore
-   users/{uid} -> Firebase's built-in sendEmailVerification ->
-   "Check Your Email". The password is set AT SIGNUP (Firebase
-   requires one to create the account). The account exists but is NOT
-   usable until the email is verified — sign-in gates on
-   emailVerified. Duplicate handling: Firebase enforces duplicate
-   emails itself (auth/email-already-in-use -> "An account with this
-   email already exists — sign in instead"). Duplicate MOBILE numbers
-   cannot be prevented with client-side Firebase auth alone (no
-   backend) — see the limitation note by FIREBASE_ACTION_SETTINGS. */
+   mobile-uniqueness check -> createUserWithEmailAndPassword ->
+   mobile claim -> profile saved once to Firestore users/{uid} ->
+   Firebase's built-in sendEmailVerification -> "Check Your Email".
+   The password is set AT SIGNUP (Firebase requires one to create the
+   account). The account exists but is NOT usable until the email is
+   verified — sign-in gates on emailVerified. Duplicate handling:
+   Firebase enforces duplicate emails itself
+   (auth/email-already-in-use -> "An account with this email already
+   exists — sign in instead"). Duplicate MOBILE numbers are refused
+   the same way (mobileNumbers lookup + rules) — see the note by
+   FIREBASE_ACTION_SETTINGS and claimMobile below. */
 function resetRegFlow(){
   evState = { email: "", name: "", mobile: "", countryCode: "+91" };
   const cw = $("#changeEmailWrap"); if(cw) cw.hidden = true;
 }
 function regSetErr(msg){ const el = $("#regErr"); if(el) el.textContent = msg || ""; }
+function showMobileDup(){
+  regSetErr("");
+  const box = $("#signupMobileDupBox"); if(box) box.hidden = false;
+}
 async function handleRegister(){
   const name = $("#regName").value;
   const ccEl = $("#regCc");
@@ -2650,6 +2728,7 @@ async function handleRegister(){
   const password = $("#regPw1").value;
   const password2 = $("#regPw2").value;
   const dupBox = $("#signupDupBox"); if(dupBox) dupBox.hidden = true;
+  const mobDupBox = $("#signupMobileDupBox"); if(mobDupBox) mobDupBox.hidden = true;
   regSetErr("");
   if(!name || name.trim().length < 2){ regSetErr("Please enter your full name."); return; }
   if(!mobile || !String(mobile).trim()){ regSetErr("Please enter your mobile number."); return; }
@@ -2660,15 +2739,46 @@ async function handleRegister(){
   if(!validPassword(password)){ regSetErr("Please choose a stronger password — at least 8 characters, with a letter and a number."); return; }
   if(password !== password2){ regSetErr("The two passwords do not match. Please type them again."); return; }
   if(!fbAuth || !fbDb){ regSetErr("Account registration is temporarily unavailable. Please try again later."); return; }
+  const mKey = mobileKey(mobile, countryCode);
   const btn = $("#regSubmit");
   const original = btn ? btn.textContent : "";
   if(btn){ btn.disabled = true; btn.textContent = "Creating your account\u2026"; }
   authMode = "signup"; pendingFlow = "verify";
   try {
+    /* Mobile uniqueness, same as email: check BEFORE creating the
+       Auth user. Each mobile may have exactly one account. A failed
+       check (rules not applied, network down) refuses signup rather
+       than creating an account whose mobile was never verified. */
+    let mobileTaken = false, mobileCheckFailed = false;
+    try { mobileTaken = await mobileTakenByOther(mKey, null); }
+    catch(ce){ mobileCheckFailed = true; }
+    if(mobileCheckFailed || mobileTaken){
+      if(mobileCheckFailed) regSetErr("Account registration is temporarily unavailable. Please try again later.");
+      else showMobileDup();
+      pendingFlow = null;
+      if(btn){ btn.disabled = false; btn.textContent = original; }
+      return;
+    }
     const cred = await fbAuth.createUserWithEmailAndPassword(email, password);
     const fu = cred.user;
     fbUser = fu;
     evState = { email: email, name: name.trim(), mobile: normMobileFor(mobile, countryCode), countryCode: countryCode };
+    /* Claim the mobile NOW, while the Firestore rules enforce
+       uniqueness (create only if the document does not exist). If
+       another signup claimed the same mobile in the meantime, the
+       claim fails: delete the just-created Auth user and refuse —
+       never leave a signed-up account whose mobile was not claimed. */
+    let claimed = false;
+    try { claimed = await claimMobile(mKey, fu.uid, email); }
+    catch(ce){ claimed = false; }
+    if(!claimed){
+      try { await fu.delete(); } catch(de){}
+      try { await fbAuth.signOut(); } catch(se){}
+      fbUser = null; pendingFlow = null;
+      showMobileDup();
+      if(btn){ btn.disabled = false; btn.textContent = original; }
+      return;
+    }
     /* Save the profile ONCE to Firestore users/{uid}. */
     try {
       await saveProfileToFirestore(fu.uid, { name: evState.name, email: email, mobile: evState.mobile, countryCode: countryCode });
@@ -2908,6 +3018,7 @@ async function handleConfirmReset(){
 const _swUp = $("#switchToSignUp"); if(_swUp) _swUp.addEventListener("click", ()=> setAuthMode("signup"));
 const _swIn = $("#switchToSignIn"); if(_swIn) _swIn.addEventListener("click", ()=> setAuthMode("signin"));
 const _dupIn = $("#dupGoSignIn"); if(_dupIn) _dupIn.addEventListener("click", ()=> setAuthMode("signin"));
+const _mobDupIn = $("#mobileDupGoSignIn"); if(_mobDupIn) _mobDupIn.addEventListener("click", ()=> setAuthMode("signin"));
 const _fIn = $("#emailFormSignIn"); if(_fIn) _fIn.addEventListener("submit", e=>{ e.preventDefault(); handlePasswordSignIn(); });
 const _regForm = $("#regForm"); if(_regForm) _regForm.addEventListener("submit", e=>{ e.preventDefault(); handleRegister(); });
 const _resendVerify = $("#resendVerifyBtn"); if(_resendVerify) _resendVerify.addEventListener("click", ()=> handleResendVerification(false));
@@ -2979,6 +3090,16 @@ if(_dForm) _dForm.addEventListener("submit", async e=>{
     if(msg){ err.textContent = msg; return; }
     const fu = fbUser || fbAuth.currentUser;
     if(!fu){ err.textContent = "Sign-in did not finish. Please try again."; return; }
+    /* Mobile uniqueness: this account already exists (created before
+       the profile step), so a taken mobile only refuses the profile
+       save — the account itself is NOT deleted. A claim by this same
+       account (e.g. claimed at registration, profile save failed
+       then) is fine and is reused. */
+    const dKey = mobileKey(mobile, countryCode);
+    let dClaimed = false;
+    try { dClaimed = await claimMobile(dKey, fu.uid, fu.email || email); }
+    catch(e){ dClaimed = false; }
+    if(!dClaimed){ err.textContent = MOBILE_DUP_MSG; return; }
     /* Save to Firestore FIRST: only once the save succeeds are the
        in-memory signed-in state (profile / user) set, so a failed save
        leaves the header and account state consistent with the unsaved
@@ -3189,8 +3310,26 @@ $("#accountForm").addEventListener("submit", async e=>{
   if(msg){ $("#accErr").textContent = msg; return; }
   const next = {name: name.trim(), mobile: normMobileFor(mobile, countryCode), countryCode: countryCode};
   if(fbUser && fbDb){
-    try { await saveProfileToFirestore(fbUser.uid, {name: next.name, email: user.email, mobile: next.mobile, countryCode: countryCode}); }
-    catch(e2){ $("#accErr").textContent = "We could not save your changes. Please try again."; return; }
+    /* Mobile uniqueness: changing to a mobile another account already
+       has is refused with the same message as signup. An unchanged
+       mobile needs no check — it is already ours, or a grandfathered
+       duplicate we must not lock the customer out over. The new
+       number is claimed BEFORE the profile save; the old claim is
+       released only afterwards, and only if we own it. */
+    const newKey = mobileKey(mobile, countryCode);
+    const oldKey = (profile && profile.mobile) ? mobileKey(profile.mobile, profile.countryCode || "+91") : "";
+    if(newKey !== oldKey){
+      let aClaimed = false;
+      try { aClaimed = await claimMobile(newKey, fbUser.uid, user.email); }
+      catch(e){ aClaimed = false; }
+      if(!aClaimed){ $("#accErr").textContent = MOBILE_DUP_MSG; return; }
+      try { await saveProfileToFirestore(fbUser.uid, {name: next.name, email: user.email, mobile: next.mobile, countryCode: countryCode}); }
+      catch(e2){ await releaseMobileIfOurs(newKey, fbUser.uid); $("#accErr").textContent = "We could not save your changes. Please try again."; return; }
+      if(oldKey) await releaseMobileIfOurs(oldKey, fbUser.uid);
+    } else {
+      try { await saveProfileToFirestore(fbUser.uid, {name: next.name, email: user.email, mobile: next.mobile, countryCode: countryCode}); }
+      catch(e2){ $("#accErr").textContent = "We could not save your changes. Please try again."; return; }
+    }
   }
   profile = next;
   syncAuthUI();
