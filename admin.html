@@ -19,6 +19,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
     <style>
       :root{
         --cream:#F6F0E5; --sand:#E9DECC; --soft:#FFFDF8;
@@ -189,6 +190,9 @@
       :root[data-theme="dark"] .badge.admin{ color:#171310; }
       .badge.ok{ border-color:var(--ok); color:var(--ok); }
       .badge.muted{ border-color:var(--line-strong); color:var(--ink-faint); }
+      .tab[hidden]{ display:none; }
+      .perm-list{ display:grid; gap:.45rem; margin:.4rem 0; }
+      .perm-list .toggle-row{ display:flex; align-items:center; gap:.6rem; }
       .err-msg{ color:var(--danger); font-size:.95rem; background:var(--soft); border:1px solid var(--danger); padding:.8rem 1rem; margin-bottom:1rem; }
       .detail-head{ display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; margin-bottom:1.2rem; }
       .detail-head h3{ font-size:1.5rem; }
@@ -290,7 +294,7 @@
 
       @media print{
         body{ background:#fff; }
-        #loginView,.adminbar,.tabs,.tool-form,.paper-actions,.session-wrap,.dash-foot,.panel-head,.toast{ display:none !important; }
+        #loginView,#forcePwView,.adminbar,.tabs,.tool-form,.paper-actions,.session-wrap,.dash-foot,.panel-head,.toast{ display:none !important; }
         main{ padding:0; max-width:none; }
         .tool-layout{ display:block; }
         .paper-scroll{ border:none; padding:0; background:#fff; }
@@ -307,10 +311,10 @@
         <p class="login-path">edencoffee.in/admin</p>
         <div class="login-rule"></div>
         <h1>Admin sign in</h1>
-        <p class="login-hint">Sign in with the EDEN admin account.</p>
+        <p class="login-hint">Sign in with your EDEN admin username and password. Usernames are not case-sensitive; passwords are, exactly as typed.</p>
         <form class="login-form" id="loginForm" autocomplete="off">
-          <label>Email
-            <input type="email" id="loginEmail" autocomplete="username" placeholder="you@example.com" />
+          <label>Username
+            <input type="text" id="loginUsername" autocomplete="username" placeholder="e.g. fidelcastro" autocapitalize="off" autocorrect="off" spellcheck="false" />
           </label>
           <label>Password
             <input type="password" id="loginPw" autocomplete="current-password" />
@@ -318,11 +322,32 @@
           <p class="form-error" id="loginError" role="alert"></p>
           <button class="btn" type="submit" id="loginBtn">Sign in</button>
         </form>
-        <div class="login-alt">
-          <button class="btn secondary" id="googleBtn" type="button">Continue with Google</button>
-          <button class="linklike" id="forgotBtn" type="button">Forgot password?</button>
-        </div>
-        <p class="login-note">Only the EDEN admin account can use this page. Other accounts are signed out automatically.</p>
+        <p class="login-note">Only EDEN admin accounts can use this page. Other accounts are signed out automatically. Locked out? There is no password reset email for admin accounts — ask the super admin to reset your password from the Users tab.</p>
+      </div>
+    </section>
+
+    <!-- ================= MUST CHANGE PASSWORD ================= -->
+    <section id="forcePwView" hidden>
+      <div class="login-card">
+        <div class="wordmark">Eden<small>Coffee</small></div>
+        <p class="login-path">edencoffee.in/admin</p>
+        <div class="login-rule"></div>
+        <h1>Set a new password</h1>
+        <p class="login-hint">This account was given a temporary password. Choose your own password before you can use the admin page.</p>
+        <form class="login-form" id="forcePwForm" autocomplete="off">
+          <label>Current password (temporary)
+            <input type="password" id="forceCurPw" autocomplete="current-password" />
+          </label>
+          <label>New password
+            <input type="password" id="forceNewPw" autocomplete="new-password" />
+          </label>
+          <label>Confirm new password
+            <input type="password" id="forceConfirmPw" autocomplete="new-password" />
+          </label>
+          <p class="form-error" id="forcePwMsg" role="alert"></p>
+          <button class="btn" type="submit" id="forcePwBtn">Set new password</button>
+        </form>
+        <p class="login-note">New password must be at least 8 characters and different from the current one.</p>
       </div>
     </section>
 
@@ -331,7 +356,7 @@
       <header class="adminbar">
         <div class="wordmark">Eden<small>Coffee</small></div>
         <div class="adminbar-actions">
-          <span class="admin-tag">Admin</span>
+          <span class="admin-tag" id="adminRoleTag">Admin</span>
           <a class="btn small secondary" href="https://edencoffee.in" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;">View site</a>
           <button class="btn small secondary" id="signOutBtn" type="button">Sign out</button>
         </div>
@@ -348,6 +373,7 @@
         <button class="tab" role="tab" data-tab="billing" aria-selected="false" type="button">Billing</button>
         <button class="tab" role="tab" data-tab="letterhead" aria-selected="false" type="button">Letterhead</button>
         <button class="tab" role="tab" data-tab="settings" aria-selected="false" type="button">Settings</button>
+        <button class="tab" role="tab" data-tab="users" aria-selected="false" type="button" id="usersTabBtn" hidden>Users</button>
       </nav>
 
       <main>
@@ -691,22 +717,81 @@
               <h3>Admin account</h3>
               <p style="color:var(--ink-soft);font-size:.95rem;margin:.2rem 0 1rem;">The account signed in to this admin page.</p>
               <ul class="plain-list">
+                <li><strong>Username</strong><span class="sub" id="adminUsername">—</span></li>
+                <li><strong>Role</strong><span class="sub" id="adminRole">—</span></li>
                 <li><strong>Email</strong><span class="sub" id="adminEmail">—</span></li>
                 <li><strong>Account ID</strong><span class="sub" id="adminUid">—</span></li>
               </ul>
-              <div class="form-actions" style="margin-top:1.1rem;">
-                <button class="btn secondary" id="sendResetBtn" type="button">Send password reset email</button>
-              </div>
-              <p class="form-error" id="resetMsg" role="alert" style="margin-top:.8rem;"></p>
+              <h3 style="margin-top:1.4rem;">Change password</h3>
+              <p style="color:var(--ink-soft);font-size:.95rem;margin:.2rem 0 1rem;">For every admin, including the super admin. You stay signed in after changing it.</p>
+              <form class="login-form" id="changePwForm" autocomplete="off" style="margin-top:.4rem;">
+                <label>Current password<input type="password" id="changeCurPw" autocomplete="current-password" /></label>
+                <label>New password<input type="password" id="changeNewPw" autocomplete="new-password" /></label>
+                <label>Confirm new password<input type="password" id="changeConfirmPw" autocomplete="new-password" /></label>
+                <p class="form-error" id="changePwMsg" role="alert"></p>
+                <button class="btn" type="submit" id="changePwBtn">Change password</button>
+              </form>
+              <p class="note" style="margin-top:.8rem;">New password must be at least 8 characters and different from the current one. Passwords are case-sensitive, exactly as typed.</p>
             </div>
             <div class="card">
               <h3>About this admin</h3>
               <ul class="plain-list">
-                <li>Sign-in is by Firebase Authentication — only the EDEN admin account can open this page. Other accounts are signed out automatically.</li>
+                <li>Sign-in is by Firebase Authentication with an EDEN admin username and password — only admin accounts listed in the Users tab can open this page. Other accounts are signed out automatically. Usernames are not case-sensitive; passwords are, exactly as typed.</li>
                 <li>Products, orders, customers, enquiries and reports live in Cloud Firestore. The Billing and Letterhead tools work in this browser, and invoices are downloaded to keep.</li>
                 <li>The real security is your Firebase, GitHub, GoDaddy and Zoho sign-ins — keep those strong and private.</li>
               </ul>
             </div>
+          </div>
+        </section>
+
+        <!-- ========== USERS (super admin only) ========== -->
+        <section class="panel" data-panel="users" hidden>
+          <div class="panel-head">
+            <h2>Users</h2>
+            <p>Admin accounts for this page. Only the super admin can see or change these. New admins sign in with their username and the temporary password you set — they must choose their own password on first sign-in.</p>
+          </div>
+          <div class="grid">
+            <div class="card">
+              <h3>Create admin account</h3>
+              <form class="login-form" id="createUserForm" autocomplete="off" style="margin-top:.4rem;">
+                <label>Username (lowercase letters and numbers only)<input type="text" id="newUsername" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="e.g. newadmin" /></label>
+                <label>Display name<input type="text" id="newDisplayName" placeholder="e.g. Priya" /></label>
+                <label>Role
+                  <select id="newRole">
+                    <option value="admin">Admin</option>
+                    <option value="superadmin">Super Admin</option>
+                  </select>
+                </label>
+                <div class="field"><p style="color:var(--ink-soft);font-size:.95rem;margin:.2rem 0 .4rem;">Tabs this account may open</p><div class="perm-list" id="newPerms"></div></div>
+                <label>Temporary password<input type="password" id="newTempPw" autocomplete="new-password" /></label>
+                <p class="form-error" id="createUserMsg" role="alert"></p>
+                <button class="btn" type="submit">Create account</button>
+              </form>
+              <p class="note" style="margin-top:.8rem;">The new admin must change the temporary password on first sign-in. There is no password reset email for admin accounts — if they get locked out, reset their password here.</p>
+            </div>
+            <div class="card">
+              <h3>Admin accounts</h3>
+              <div id="adminUsersList"><p class="empty-msg">Loading…</p></div>
+            </div>
+          </div>
+          <div class="card" id="editPermsCard" hidden style="margin-top:1.6rem;">
+            <h3>Permissions for <span id="editPermsName">—</span></h3>
+            <p style="color:var(--ink-soft);font-size:.95rem;margin:.2rem 0 1rem;">Tick the tabs this admin may open. The Users tab itself is never grantable — only a super admin sees it.</p>
+            <div class="perm-list" id="editPerms"></div>
+            <div class="form-actions" style="margin-top:1rem;">
+              <button class="btn" type="button" id="editPermsSave">Save permissions</button>
+              <button class="btn secondary" type="button" id="editPermsCancel">Cancel</button>
+            </div>
+          </div>
+          <div class="card" id="resetPwCard" hidden style="margin-top:1.6rem;">
+            <h3>Reset password for <span id="resetPwName">—</span></h3>
+            <p style="color:var(--ink-soft);font-size:.95rem;margin:.2rem 0 1rem;">Set a new temporary password. The admin must change it on their next sign-in.</p>
+            <form class="login-form" id="resetPwForm" autocomplete="off">
+              <label>New temporary password<input type="password" id="resetTempPw" autocomplete="new-password" /></label>
+              <p class="form-error" id="resetPwMsg" role="alert"></p>
+              <button class="btn" type="submit">Reset password</button>
+              <button class="btn secondary" type="button" id="resetPwCancel">Cancel</button>
+            </form>
           </div>
         </section>
       </main>
@@ -732,7 +817,25 @@
         messagingSenderId: "152778837716",
         appId: "1:152778837716:web:aa77e7b3abc7c0335d3541"
       };
-      var OWNER_UID = "x9CBcFGjc8fWay6kapFTm8HPGCs2";
+      /* ---------- admin accounts ----------
+         Sign-in is username + password only (no Google). A username is
+         normalised to lowercase and resolved to the Firebase Auth email
+         for that admin. The two founding accounts are listed here
+         explicitly; accounts created later in the Users tab are resolved
+         through Firestore (adminUsernames/{username}), which the super
+         admin writes when creating the account. An email is NEVER built
+         from raw typed input — if the username is in neither place, the
+         sign-in is refused. Passwords are never stored, logged or shown
+         anywhere on this page; they live only in Firebase Auth. */
+      var ADMIN_DOMAIN = "edencoffee.in";
+      var ADMIN_ACCOUNTS = {
+        "fidelcastro": "fidelcastro@edencoffee.in",
+        "edencoffee": "edencoffee@edencoffee.in"
+      };
+      var ALL_TABS = ["dashboard","products","orders","customers","reports","enquiries","content","billing","letterhead","settings"];
+      var ADMIN_DEFAULT_PERMS = ALL_TABS.slice();
+      var currentAdmin = null; /* { uid, username, email, displayName, role, permissions[], active, mustChangePassword } */
+      var adminUidSet = {}; /* uid -> true, for the "Admin" badge in the Customers list */
       if (!window.firebase) {
         $("loginError").textContent = "Firebase could not load. Check your connection and reload.";
         return;
@@ -740,6 +843,20 @@
       firebase.initializeApp(firebaseConfig);
       var auth = firebase.auth();
       var db = firebase.firestore();
+      /* Secondary Firebase app, used ONLY to create new admin accounts:
+         creating a user on the main app would sign the super admin out,
+         so account creation runs on this second app and the super admin
+         stays signed in on the main one. */
+      var secondaryApp = null, secondaryAuth = null;
+      try {
+        secondaryApp = firebase.initializeApp(firebaseConfig, "edenAdminSecondary");
+        secondaryAuth = secondaryApp.auth();
+      } catch (e) { /* account creation will report that it is unavailable */ }
+      /* Cloud Functions handle, used only for resetting another admin's
+         password (the client SDK cannot do that). If the function is not
+         deployed, the reset form says so plainly instead of pretending. */
+      var functions = null;
+      try { functions = firebase.functions(); } catch (e) { /* reset backend not loaded */ }
 
       var store = {
         get: function(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } },
@@ -901,92 +1018,174 @@
         el.innerHTML = '<p class="empty-msg">' + esc(msg || "Loading…") + "</p>";
       }
 
-      /* ---------- auth ---------- */
-      var loginView = $("loginView"), dashView = $("dashView");
+      /* ---------- auth: username + password only ----------
+         No Google sign-in on this page. A username is normalised to
+         lowercase (so FIDELCASTRO, FidelCastro and fidelcastro are the
+         same account); the password is used exactly as typed and is
+         never lowercased, trimmed or otherwise changed. */
+      var loginView = $("loginView"), dashView = $("dashView"), forcePwView = $("forcePwView");
       var dashShown = false;
-      function showLogin(){
-        dashView.hidden = true; loginView.hidden = false;
+      function hideAllViews(){
+        loginView.hidden = true; dashView.hidden = true; forcePwView.hidden = true;
         dashShown = false;
+      }
+      function showLogin(){
+        hideAllViews(); loginView.hidden = false;
         window.scrollTo(0,0);
       }
       function showDash(){
-        loginView.hidden = true; dashView.hidden = false;
+        hideAllViews(); dashView.hidden = false;
         dashShown = true;
         window.scrollTo(0,0);
         var u = auth.currentUser;
         if (u){
           $("adminEmail").textContent = u.email || "—";
           $("adminUid").textContent = u.uid || "—";
+          $("adminUsername").textContent = (currentAdmin && currentAdmin.username) || "—";
+          $("adminRole").textContent = currentAdmin ? roleLabel(currentAdmin.role) : "—";
+          $("adminRoleTag").textContent = currentAdmin ? roleLabel(currentAdmin.role) : "Admin";
         }
+      }
+      function showForcePw(){
+        hideAllViews(); forcePwView.hidden = false;
+        window.scrollTo(0,0);
+      }
+      function roleLabel(role){
+        return role === "superadmin" ? "Super Admin" : "Admin";
+      }
+      function normalizeUsername(v){
+        return String(v == null ? "" : v).trim().toLowerCase();
+      }
+      function validUsername(v){
+        return /^[a-z0-9]{3,32}$/.test(v);
+      }
+      /* Resolve a username to its Firebase Auth email. The two founding
+         accounts are listed explicitly above; accounts created in the
+         Users tab are resolved through the adminUsernames lookup the
+         super admin writes at creation. An email is never built from
+         raw typed input. */
+      function resolveAdminEmail(username){
+        if (ADMIN_ACCOUNTS[username]) return Promise.resolve(ADMIN_ACCOUNTS[username]);
+        return db.collection("adminUsernames").doc(username).get().then(function(snap){
+          if (!snap.exists) return null;
+          var d = snap.data() || {};
+          return (typeof d.email === "string" && d.email) ? d.email : null;
+        }).catch(function(){ return null; });
+      }
+      function loadAdminProfile(uid){
+        return db.collection("admins").doc(uid).get().then(function(snap){
+          if (!snap.exists) return null;
+          var d = snap.data() || {};
+          d.uid = uid;
+          return d;
+        }).catch(function(){ return null; });
+      }
+      function adminPermissions(admin){
+        if (!admin) return [];
+        if (admin.role === "superadmin") return ALL_TABS.concat(["users"]);
+        var p = Array.isArray(admin.permissions) ? admin.permissions.slice() : [];
+        return p.filter(function(t){ return ALL_TABS.indexOf(t) !== -1; });
+      }
+      function canOpenTab(name){
+        if (!currentAdmin) return false;
+        if (name === "users") return currentAdmin.role === "superadmin";
+        return adminPermissions(currentAdmin).indexOf(name) !== -1;
+      }
+      function applyPermissions(){
+        /* Hide every tab the signed-in admin may not open. Hiding is
+           only the visible half — switchTab() refuses the tab too. */
+        var allTabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+        allTabs.forEach(function(t){
+          t.hidden = !canOpenTab(t.getAttribute("data-tab"));
+        });
+        if (dashShown){
+          var sel = document.querySelector('.tab[aria-selected="true"]');
+          var current = sel ? sel.getAttribute("data-tab") : "dashboard";
+          if (!canOpenTab(current)){
+            var first = adminPermissions(currentAdmin)[0] || "dashboard";
+            switchTab(first);
+          }
+        }
+      }
+      function refreshAdminUidSet(){
+        /* Uids of admin accounts, used for the "Admin" badge in the
+           Customers list. Only the super admin can read the whole
+           collection; anyone else just sees their own uid. */
+        return db.collection("admins").get().then(function(snap){
+          adminUidSet = {};
+          snap.forEach(function(doc){ adminUidSet[doc.id] = true; });
+        }).catch(function(){
+          adminUidSet = {};
+          if (auth.currentUser) adminUidSet[auth.currentUser.uid] = true;
+        });
       }
       function authErrorText(err){
         if (!err) return "Sign-in failed. Try again.";
         switch (err.code){
-          case "auth/invalid-email": return "That email address doesn't look right.";
-          case "auth/user-not-found": return "No account with that email. Check the email and try again.";
-          case "auth/wrong-password": return "Wrong password. Try again, or use Forgot password.";
-          case "auth/invalid-credential": return "Email or password doesn't match. Try again, or use Forgot password.";
+          case "auth/invalid-email": return "That username doesn't map to an admin account.";
+          case "auth/user-not-found": return "No admin account with that username. Ask the super admin to create one.";
+          case "auth/wrong-password": return "Username or password doesn't match. Usernames are not case-sensitive; passwords are, exactly as typed.";
+          case "auth/invalid-credential": return "Username or password doesn't match. Usernames are not case-sensitive; passwords are, exactly as typed.";
           case "auth/too-many-requests": return "Too many attempts — wait a little and try again.";
-          case "auth/popup-closed-by-user": return "The Google sign-in window was closed. Try again.";
           case "auth/network-request-failed": return "Network problem — check your connection and try again.";
           default: return "Sign-in failed" + (err.message ? ": " + err.message : ".");
         }
       }
       $("loginForm").addEventListener("submit", function(ev){
         ev.preventDefault();
-        var email = $("loginEmail").value.trim();
-        var pw = $("loginPw").value;
+        var username = normalizeUsername($("loginUsername").value);
+        var pw = $("loginPw").value; /* used exactly as typed — never normalised */
         var err = $("loginError");
-        if (!email || !pw){ err.textContent = "Enter your email and password."; return; }
+        if (!username || !pw){ err.textContent = "Enter your username and password."; return; }
+        if (!validUsername(username)){ err.textContent = "Usernames use lowercase letters and numbers only."; return; }
         err.textContent = "";
         $("loginBtn").disabled = true;
-        auth.signInWithEmailAndPassword(email, pw).then(function(){
-          /* onAuthStateChanged decides */
+        resolveAdminEmail(username).then(function(email){
+          if (!email) throw { code: "auth/user-not-found" };
+          return auth.signInWithEmailAndPassword(email, pw);
+          /* onAuthStateChanged decides from here */
         }).catch(function(e){
           err.textContent = authErrorText(e);
         }).finally(function(){
           $("loginBtn").disabled = false;
         });
       });
-      $("googleBtn").addEventListener("click", function(){
-        $("loginError").textContent = "";
-        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){
-          $("loginError").textContent = authErrorText(e);
-        });
-      });
-      $("forgotBtn").addEventListener("click", function(){
-        var email = $("loginEmail").value.trim();
-        var err = $("loginError");
-        if (!email){ err.textContent = "Enter your email above first, then tap Forgot password."; return; }
-        err.textContent = "";
-        auth.sendPasswordResetEmail(email).then(function(){
-          err.textContent = "";
-          toast("Password reset email sent to " + email + ".");
-        }).catch(function(e){
-          err.textContent = authErrorText(e);
-        });
-      });
       $("signOutBtn").addEventListener("click", function(){
+        currentAdmin = null;
         auth.signOut();
       });
-      var nonOwnerShown = false;
+      var routing = false;
       auth.onAuthStateChanged(function(user){
-        if (user && user.uid === OWNER_UID){
-          nonOwnerShown = false;
+        if (routing) return;
+        if (!user){ currentAdmin = null; showLogin(); return; }
+        routing = true;
+        loadAdminProfile(user.uid).then(function(admin){
+          routing = false;
+          if (!admin){
+            auth.signOut().then(function(){
+              $("loginError").textContent = "This account is not an EDEN admin. Ask the super admin to create an admin account for it.";
+            });
+            showLogin();
+            return;
+          }
+          if (admin.active === false){
+            auth.signOut().then(function(){
+              $("loginError").textContent = "This admin account is deactivated. Ask the super admin to reactivate it.";
+            });
+            showLogin();
+            return;
+          }
+          currentAdmin = admin;
+          refreshAdminUidSet();
+          if (admin.mustChangePassword){
+            showForcePw();
+            return;
+          }
           showDash();
+          applyPermissions();
           loadBizFromFirestore();
           if (!dashLoaded) loadDashboard();
-        } else if (user){
-          if (!nonOwnerShown){
-            nonOwnerShown = true;
-            auth.signOut().then(function(){
-              $("loginError").textContent = "This account is not the EDEN admin.";
-            });
-          }
-          showLogin();
-        } else {
-          showLogin();
-        }
+        });
       });
 
       /* ---------- tabs ---------- */
@@ -1002,9 +1201,17 @@
         content: loadSiteSettings,
         billing: null,
         letterhead: null,
-        settings: null
+        settings: null,
+        users: loadAdminUsers
       };
       function switchTab(name){
+        /* Tab permissions are enforced here, not only by hiding the tab
+           buttons: any route to a tab the signed-in admin may not open
+           is refused, including programmatic calls. */
+        if (dashShown && !canOpenTab(name)){
+          toast("You don't have permission to open that section.");
+          return;
+        }
         tabs.forEach(function(t){ t.setAttribute("aria-selected", t.getAttribute("data-tab") === name ? "true" : "false"); });
         panels.forEach(function(p){ p.hidden = p.getAttribute("data-panel") !== name; });
         window.scrollTo(0,0);
@@ -1350,7 +1557,7 @@
           }
           var html = '<div class="table-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Joined</th><th>Role</th></tr></thead><tbody>';
           customersCache.forEach(function(u){
-            var isAdmin = u._id === OWNER_UID;
+            var isAdmin = !!adminUidSet[u._id];
             html += '<tr class="clickable" data-uid="' + esc(u._id) + '"><td>' + esc(u.name || u.displayName || u.fullName || "—") +
               "</td><td>" + esc(u.email || "—") + "</td><td>" + esc(u.mobile || u.phone || "—") +
               "</td><td>" + esc(fmtDateTime(tsToDate(u.createdAt) || tsToDate(u.joinedAt))) +
@@ -1372,7 +1579,7 @@
         $("customersList").hidden = true;
         $("customerDetail").hidden = false;
         $("cdTitle").textContent = u.name || u.displayName || u.email || "Customer";
-        var isAdmin = uid === OWNER_UID;
+        var isAdmin = !!adminUidSet[uid];
         var addrs = Array.isArray(u.addresses) ? u.addresses : [];
         var addrHtml = addrs.length ? addrs.map(function(a, i){
           var lines = addrLines(a);
@@ -1582,17 +1789,245 @@
         });
       });
 
-      /* ---------- Settings: admin account ---------- */
-      $("sendResetBtn").addEventListener("click", function(){
-        var u = auth.currentUser;
-        var msg = $("resetMsg");
-        if (!u || !u.email){ msg.textContent = "No admin account is signed in."; return; }
+      /* ---------- Change password (every signed-in admin) ----------
+         The super admin changes their own password here exactly like
+         any other admin: current password + new password + confirm.
+         Re-authentication with the current password is required first.
+         No password is displayed, logged or stored by this page. */
+      function doChangePassword(curId, newId, confId, msgId, btn, afterOk){
+        var user = auth.currentUser;
+        var msg = $(msgId);
+        if (!user || !user.email){ msg.textContent = "No admin account is signed in."; return; }
+        var cur = $(curId).value; /* exactly as typed */
+        var next = $(newId).value;
+        var conf = $(confId).value;
+        if (!cur || !next || !conf){ msg.textContent = "Fill in all three password fields."; return; }
+        if (next.length < 8){ msg.textContent = "The new password must be at least 8 characters."; return; }
+        if (next === cur){ msg.textContent = "The new password must be different from the current one."; return; }
+        if (next !== conf){ msg.textContent = "The new password and its confirmation don't match."; return; }
         msg.textContent = "";
-        auth.sendPasswordResetEmail(u.email).then(function(){
+        btn.disabled = true;
+        var cred = firebase.auth.EmailAuthProvider.credential(user.email, cur);
+        user.reauthenticateWithCredential(cred).then(function(){
+          return user.updatePassword(next);
+        }).then(function(){
+          $(curId).value = ""; $(newId).value = ""; $(confId).value = "";
           msg.textContent = "";
-          toast("Password reset email sent to " + u.email + ".");
+          toast("Password changed.");
+          if (afterOk) afterOk();
         }).catch(function(e){
-          msg.textContent = authErrorText(e);
+          if (e && (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential")) msg.textContent = "The current password is wrong. Try again.";
+          else if (e && e.code === "auth/weak-password") msg.textContent = "That password is too weak — use at least 8 characters.";
+          else msg.textContent = "Could not change the password" + (e && e.message ? ": " + e.message : ".");
+        }).finally(function(){
+          btn.disabled = false;
+        });
+      }
+      $("changePwForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        doChangePassword("changeCurPw", "changeNewPw", "changeConfirmPw", "changePwMsg", $("changePwBtn"), null);
+      });
+      $("forcePwForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        doChangePassword("forceCurPw", "forceNewPw", "forceConfirmPw", "forcePwMsg", $("forcePwBtn"), function(){
+          /* First sign-in with a temporary password: clear the flag,
+             then open the dashboard. */
+          var u = auth.currentUser;
+          if (!u || !currentAdmin){ showDash(); return; }
+          db.collection("admins").doc(u.uid).update({ mustChangePassword: false }).then(function(){
+            currentAdmin.mustChangePassword = false;
+            showDash();
+            applyPermissions();
+            loadBizFromFirestore();
+            if (!dashLoaded) loadDashboard();
+          }).catch(function(){
+            toast("Password changed, but the admin record could not be updated — sign out and sign in again.");
+            showDash();
+          });
+        });
+      });
+
+      /* ---------- Users tab (super admin only) ---------- */
+      var TAB_LABELS = {
+        dashboard: "Dashboard", products: "Products", orders: "Orders", customers: "Customers",
+        reports: "Reports", enquiries: "Enquiries", content: "Content", billing: "Billing",
+        letterhead: "Letterhead", settings: "Settings"
+      };
+      var adminUsersCache = [];
+      var editPermsUid = null;
+      var resetTargetUid = null, resetTargetName = "";
+      function renderPermCheckboxes(container, selected, locked){
+        var box = $(container);
+        box.innerHTML = "";
+        ALL_TABS.forEach(function(t){
+          var lab = document.createElement("label");
+          lab.className = "toggle-row";
+          var cb = document.createElement("input");
+          cb.type = "checkbox"; cb.value = t; cb.checked = selected.indexOf(t) !== -1;
+          if (locked) cb.disabled = true;
+          lab.appendChild(cb);
+          lab.appendChild(document.createTextNode(" " + TAB_LABELS[t]));
+          box.appendChild(lab);
+        });
+      }
+      function selectedPerms(container){
+        var out = [];
+        Array.prototype.forEach.call($(container).querySelectorAll('input[type="checkbox"]'), function(cb){
+          if (cb.checked) out.push(cb.value);
+        });
+        return out;
+      }
+      renderPermCheckboxes("newPerms", ADMIN_DEFAULT_PERMS.slice(), false);
+      $("newRole").addEventListener("change", function(){
+        var isSuper = $("newRole").value === "superadmin";
+        renderPermCheckboxes("newPerms", ALL_TABS.slice(), isSuper);
+      });
+      function loadAdminUsers(){
+        var list = $("adminUsersList");
+        loading(list, "Loading admin accounts…");
+        db.collection("admins").get().then(function(snap){
+          var rows = [];
+          snap.forEach(function(doc){ var d = doc.data() || {}; d._id = doc.id; rows.push(d); });
+          rows.sort(function(a, b){ return String(a.username || "").localeCompare(String(b.username || "")); });
+          adminUsersCache = rows;
+          if (!rows.length){ list.innerHTML = '<p class="empty-msg">No admin accounts yet.</p>'; return; }
+          var html = '<div class="table-scroll"><table class="data-table"><thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Tabs</th><th>Status</th><th>Created</th><th></th></tr></thead><tbody>';
+          rows.forEach(function(a){
+            var perms = a.role === "superadmin" ? "All tabs" : (Array.isArray(a.permissions) ? a.permissions.map(function(t){ return TAB_LABELS[t] || t; }).join(", ") : "—");
+            html += '<tr data-uid="' + esc(a._id) + '"><td><strong>' + esc(a.username || "—") + '</strong></td><td>' + esc(a.displayName || "—") + '</td><td>' + esc(roleLabel(a.role)) + '</td><td>' + esc(perms) + '</td><td>' + (a.active === false ? '<span class="badge muted">Deactivated</span>' : '<span class="badge ok">Active</span>') + (a.mustChangePassword ? ' <span class="badge">Must change password</span>' : "") + '</td><td>' + esc(fmtDateTime(tsToDate(a.createdAt))) + '</td><td>' +
+              '<button type="button" class="btn small secondary" data-act="perms">Permissions</button> ' +
+              '<button type="button" class="btn small secondary" data-act="toggle">' + (a.active === false ? "Activate" : "Deactivate") + '</button> ' +
+              '<button type="button" class="btn small secondary" data-act="reset">Reset password</button></td></tr>';
+          });
+          html += "</tbody></table></div>";
+          list.innerHTML = html;
+          Array.prototype.forEach.call(list.querySelectorAll("tr[data-uid]"), function(row){
+            var uid = row.getAttribute("data-uid");
+            var a = null;
+            rows.forEach(function(x){ if (x._id === uid) a = x; });
+            row.querySelector('[data-act="perms"]').addEventListener("click", function(){ editAdminPerms(a); });
+            row.querySelector('[data-act="toggle"]').addEventListener("click", function(){ toggleAdminActive(a); });
+            row.querySelector('[data-act="reset"]').addEventListener("click", function(){ openResetPw(a); });
+          });
+        }).catch(function(err){ loadError(list, err, "the admin accounts"); });
+      }
+      $("createUserForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var username = normalizeUsername($("newUsername").value);
+        var displayName = $("newDisplayName").value.trim();
+        var role = $("newRole").value;
+        var perms = role === "superadmin" ? ALL_TABS.slice() : selectedPerms("newPerms");
+        var tempPw = $("newTempPw").value; /* set by the super admin; the new admin must change it on first sign-in */
+        var msg = $("createUserMsg");
+        if (!validUsername(username)){ msg.textContent = "Username must be 3–32 lowercase letters and numbers only."; return; }
+        if (!displayName){ msg.textContent = "Enter a display name."; return; }
+        if (role !== "superadmin" && role !== "admin"){ msg.textContent = "Choose a role."; return; }
+        if (tempPw.length < 8){ msg.textContent = "The temporary password must be at least 8 characters."; return; }
+        if (!secondaryAuth){ msg.textContent = "Account creation is unavailable in this browser — the second sign-in service could not start. Reload and try again."; return; }
+        msg.textContent = "";
+        var btn = ev.target.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        var email = username + "@" + ADMIN_DOMAIN;
+        db.collection("adminUsernames").doc(username).get().then(function(snap){
+          if (snap.exists) throw { code: "username-taken", message: "That username is already taken." };
+          return secondaryAuth.createUserWithEmailAndPassword(email, tempPw);
+        }).then(function(cred){
+          var uid = cred.user.uid;
+          var doc = {
+            username: username, email: email, displayName: displayName,
+            role: role, permissions: perms, active: true, mustChangePassword: true,
+            createdBy: auth.currentUser ? auth.currentUser.uid : "",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          };
+          return db.collection("admins").doc(uid).set(doc).then(function(){
+            return db.collection("adminUsernames").doc(username).set({ uid: uid, email: email });
+          }).then(function(){ return uid; }).catch(function(err){
+            /* The sign-in account exists but the admin record did not
+               save — say so plainly and do not pretend it is ready. The
+               orphan sign-in account must be deleted in the Firebase
+               console (Authentication) before trying again. */
+            throw { code: "admin-doc-failed", message: "The sign-in account was created, but the admin record could not be saved (" + (err && err.code ? err.code : "error") + "). The account is NOT ready — delete " + email + " in Firebase Authentication and try again." };
+          });
+        }).then(function(){
+          toast("Admin account " + username + " created. They must change the temporary password on first sign-in.");
+          $("newUsername").value = ""; $("newDisplayName").value = ""; $("newTempPw").value = "";
+          $("newRole").value = "admin";
+          renderPermCheckboxes("newPerms", ADMIN_DEFAULT_PERMS.slice(), false);
+          loadAdminUsers();
+        }).catch(function(e){
+          msg.textContent = (e && e.code === "auth/email-already-in-use") ? "That username is already taken." :
+            (e && e.message ? e.message : "Could not create the account. Try again.");
+        }).finally(function(){
+          btn.disabled = false;
+        });
+      });
+      function editAdminPerms(a){
+        if (!a) return;
+        if (a.role === "superadmin"){ toast("Super admins always have every tab — their permissions can't be narrowed."); return; }
+        editPermsUid = a._id;
+        $("editPermsName").textContent = a.username || a.email || "—";
+        renderPermCheckboxes("editPerms", Array.isArray(a.permissions) ? a.permissions : [], false);
+        $("editPermsCard").hidden = false;
+        $("editPermsCard").scrollIntoView();
+      }
+      $("editPermsSave").addEventListener("click", function(){
+        if (!editPermsUid) return;
+        var perms = selectedPerms("editPerms");
+        db.collection("admins").doc(editPermsUid).update({ permissions: perms }).then(function(){
+          toast("Permissions saved.");
+          $("editPermsCard").hidden = true;
+          loadAdminUsers();
+        }).catch(function(e){
+          toast("Could not save permissions (" + (e && e.code ? e.code : "error") + ").");
+        });
+      });
+      $("editPermsCancel").addEventListener("click", function(){ $("editPermsCard").hidden = true; editPermsUid = null; });
+      function toggleAdminActive(a){
+        if (!a) return;
+        if (a._id === (auth.currentUser && auth.currentUser.uid)){ toast("You can't deactivate your own account."); return; }
+        var turningOff = a.active !== false;
+        if (turningOff && a.role === "superadmin"){
+          var others = adminUsersCache.filter(function(x){ return x.role === "superadmin" && x.active !== false && x._id !== a._id; });
+          if (!others.length){ toast("You can't deactivate the last active super admin."); return; }
+        }
+        db.collection("admins").doc(a._id).update({ active: turningOff ? false : true }).then(function(){
+          toast((turningOff ? "Deactivated " : "Activated ") + (a.username || a.email || "account") + ".");
+          loadAdminUsers();
+        }).catch(function(e){
+          toast("Could not change the account status (" + (e && e.code ? e.code : "error") + ").");
+        });
+      }
+      function openResetPw(a){
+        if (!a) return;
+        resetTargetUid = a._id; resetTargetName = a.username || a.email || "—";
+        $("resetPwName").textContent = resetTargetName;
+        $("resetTempPw").value = "";
+        $("resetPwMsg").textContent = "";
+        $("resetPwCard").hidden = false;
+        $("resetPwCard").scrollIntoView();
+      }
+      $("resetPwCancel").addEventListener("click", function(){ $("resetPwCard").hidden = true; resetTargetUid = null; });
+      $("resetPwForm").addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var pw = $("resetTempPw").value;
+        var msg = $("resetPwMsg");
+        if (!resetTargetUid){ msg.textContent = "Choose an account first."; return; }
+        if (pw.length < 8){ msg.textContent = "The temporary password must be at least 8 characters."; return; }
+        /* Resetting ANOTHER admin's password needs the Cloud Function
+           (the client SDK can only change the signed-in user's own
+           password). If it is not deployed, say so plainly. */
+        if (!functions){ msg.textContent = "The password-reset service is not deployed yet — ask the owner to deploy the admin functions, then try again."; return; }
+        msg.textContent = "";
+        var btn = ev.target.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        functions.httpsCallable("resetAdminPassword")({ uid: resetTargetUid, tempPassword: pw }).then(function(){
+          toast("Password reset for " + resetTargetName + ". They must change it on next sign-in.");
+          $("resetPwCard").hidden = true; resetTargetUid = null;
+          loadAdminUsers();
+        }).catch(function(e){
+          msg.textContent = (e && e.message) ? e.message : "Could not reset the password. Try again.";
+        }).finally(function(){
+          btn.disabled = false;
         });
       });
 
