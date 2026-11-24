@@ -31,7 +31,7 @@
     { "@type": "Organization", "@id": "https://edencoffee.in/#organization", "name": "EDEN Coffee", "url": "https://edencoffee.in/", "slogan": "Where Conversations Brew.", "email": "hello@edencoffee.in", "sameAs": ["https://www.instagram.com/edencoffeeindia/"] },
     { "@type": "WebSite", "@id": "https://edencoffee.in/#website", "url": "https://edencoffee.in/", "name": "EDEN Coffee", "publisher": { "@id": "https://edencoffee.in/#organization" } },
     { "@type": "Store", "@id": "https://edencoffee.in/#store", "name": "EDEN Coffee", "url": "https://edencoffee.in/", "description": "A coffee shop in Nellore for roasted coffee beans in Nellore and coffee powder in Nellore — South Indian filter coffee in Nellore, 100% Arabica beans in Nellore, Arabica and Robusta beans and ground coffee, sold online and at the EDEN Coffee walk-in store in Nellore. Coffee beans in Andhra Pradesh and coffee powder in Andhra Pradesh, with Arabica beans online and bulk supply enquiries welcome. Beans and coffee powder only; no brewing or serving.", "email": "hello@edencoffee.in", "telephone": "+91-9441444715", "address": { "@type": "PostalAddress", "streetAddress": "DNSSS Shopping Complex, Podalakur Road, AK Nagar Post Office", "addressLocality": "Nellore", "addressRegion": "Andhra Pradesh", "postalCode": "524004", "addressCountry": "IN" }, "geo": { "@type": "GeoCoordinates", "latitude": 14.4179985, "longitude": 79.9546840 }, "hasMap": "https://maps.app.goo.gl/LcVhgjjwDbVJbSxn8", "areaServed": "Nellore, Andhra Pradesh, India" },
-    { "@type": "Product", "@id": "https://edencoffee.in/#daily-filter-coffee-powder", "name": "EDEN Daily — South Indian Filter Coffee Powder", "description": "Filter coffee powder in Nellore from the EDEN Daily range — South Indian filter coffee in Nellore in Classic, Strong and Pure blends, as fresh coffee powder in Nellore and coffee powder in Andhra Pradesh at the Nellore outlet and online at edencoffee.in.", "brand": { "@id": "https://edencoffee.in/#organization" }, "category": "Coffee Powder", "url": "https://edencoffee.in/#shop" },
+    { "@type": "Product", "@id": "https://edencoffee.in/#daily-filter-coffee-powder", "name": "EDEN Daily — South Indian Filter Coffee Powder", "description": "Filter coffee powder in Nellore from the EDEN Daily range — South Indian filter coffee in Nellore in Classic and Strong blends, as fresh coffee powder in Nellore and coffee powder in Andhra Pradesh at the Nellore outlet and online at edencoffee.in.", "brand": { "@id": "https://edencoffee.in/#organization" }, "category": "Coffee Powder", "url": "https://edencoffee.in/#shop" },
     { "@type": "Product", "@id": "https://edencoffee.in/#reserve-coffee-beans", "name": "EDEN Reserve — Arabica & Robusta Coffee Beans", "description": "100% Arabica beans in Nellore, Arabica coffee beans in Nellore and Robusta coffee beans in Nellore from the EDEN Reserve range, plus a premium Arabica–Robusta blend — whole beans or ground coffee in Nellore, including espresso coffee beans in Nellore and Arabica beans online, at the Nellore outlet and online at edencoffee.in.", "brand": { "@id": "https://edencoffee.in/#organization" }, "category": "Coffee Beans", "url": "https://edencoffee.in/#shop" }
   ]
 }
@@ -397,6 +397,17 @@ section[id],#letter{scroll-margin-top:calc(var(--hdr) + 14px)}
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,80px)}
 .contact h2{font-size:clamp(32px,3.8vw,46px);margin:12px 0 14px}
 .contact p{color:var(--ink-soft);max-width:44ch}
+.contact-icons{display:flex;flex-wrap:wrap;gap:20px;margin-top:16px}
+.contact-icons .ci{display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--forest);text-decoration:none;min-width:52px}
+.contact-icons .ci svg{width:26px;height:26px}
+.contact-icons .ci .ci-wa{fill:currentColor}
+.contact-icons .ci svg.st{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.contact-icons .ci span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;color:var(--ink-soft)}
+.contact-icons .ci:hover{color:var(--gold)}
+.foot-ic{display:inline-block;vertical-align:-2px;color:var(--gold);text-decoration:none}
+.foot-ic svg{width:15px;height:15px}
+.foot-ic .fi-wa{fill:currentColor}
+.foot-ic svg.st{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .form{display:grid;gap:14px}
 /* Inside the auth views the hidden attribute must beat .form's
    display:grid — otherwise switched-off steps stay visible. */
@@ -603,7 +614,7 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
     <div class="hdr-icons">
       <a class="wa-pill" id="waHeaderBtn" href="#" target="_blank" rel="noopener" aria-label="Chat with EDEN Coffee on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg><span class="wa-txt">WhatsApp</span></a>
       <button class="hdr-act auth-pending" id="authBtn" type="button">Sign In</button>
-      <button class="hdr-act" id="ordersBtn" type="button">Dashboard</button>
+      <button class="hdr-act" id="ordersBtn" type="button" style="display:none">Dashboard</button>
       <button class="icon-btn" id="cartBtn" type="button" aria-label="Open cart">
         <svg viewBox="0 0 24 24"><path d="M5.5 8h15l-1.6 9.5H7.2L5.5 8z"/><path d="M5.5 8L4.6 3.5H2.5"/><circle cx="9.5" cy="21" r="1.1"/><circle cx="17.5" cy="21" r="1.1"/></svg>
         <span class="cart-count" id="cartCount" hidden>0</span>
@@ -780,13 +791,14 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
       <div class="shopsec-head reveal">
         <span class="kicker">The Shop · Arriving at Launch</span>
         <h2>The range, ready for launch.</h2>
-        <p>Six coffees — three for the daily filter, three from the roaster's reserve. Tap any pack and it opens into its full page, exactly the way the shop will work when orders open at launch.</p>
+        <p>Six coffees — two for the daily filter, three from the roaster's reserve, and one rare peaberry. Tap any pack and it opens into its full page, exactly the way the shop will work when orders open at launch.</p>
         <p class="launch-tag" style="margin-top:16px">Launching soon — orders open at brand launch</p>
       </div>
       <div class="filter-row" id="shopFilters" role="group" aria-label="Filter the shop by collection">
         <button type="button" data-filter="all" class="on">All Coffees</button>
         <button type="button" data-filter="EDEN Daily">EDEN Daily</button>
         <button type="button" data-filter="EDEN Reserve">EDEN Reserve</button>
+        <button type="button" data-filter="EDEN Signature">EDEN Signature</button>
       </div>
       <div class="pgrid" id="pgrid"></div>
     </div>
@@ -804,12 +816,6 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
         <div class="gift-body">
           <span class="col-tag">EDEN Coffee · Gifting</span>
           <h3>Luxury Gift Box</h3>
-          <p class="form-line">2 × 100g coffee packs · gift boxed</p>
-          <p>Two 100 g packs of EDEN coffee in a luxury gift box — the easy way to introduce someone to EDEN.</p>
-          <div class="card-actions">
-            <button class="btn solid" id="giftAdd" type="button">Add to Cart</button>
-            <button class="btn ghost" id="giftView" type="button" data-pid="luxury-gift-box">View the Box</button>
-          </div>
         </div>
       </div>
     </div>
@@ -850,12 +856,12 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
       <div class="nellore-head reveal">
         <span class="kicker">EDEN Coffee · Nellore</span>
         <h2>Roasted coffee beans &amp; coffee powder in Nellore</h2>
-        <p>If you are looking for coffee beans in Nellore or coffee powder in Nellore, EDEN Coffee is a coffee shop in Nellore built around one small range: small-batch roasted coffee beans in Nellore, sold whole or ground and packed for home brewing, alongside our filter coffee powders. We also serve coffee beans in Andhra Pradesh and coffee powder in Andhra Pradesh, across the state. Find us at DNSSS Shopping Complex, Podalakur Road, AK Nagar, Nellore 524004 — and online at edencoffee.in.</p>
+        <p>If you are looking for coffee beans in Nellore or coffee powder in Nellore, EDEN Coffee is a coffee shop in Nellore built around one small range: small-batch roasted coffee beans in Nellore, sold whole or ground and packed for home brewing, alongside our filter coffee powders. We also serve coffee beans in Andhra Pradesh and coffee powder in Andhra Pradesh, across the state. Find us at DNSSS Shopping Complex, Podalakur Road, AK Nagar Post Office, Nellore, Andhra Pradesh — 524004 — and online at edencoffee.in.</p>
       </div>
       <div class="nellore-cols">
         <div class="reveal">
           <h3>EDEN Daily — filter coffee powder</h3>
-          <p>Daily is our South Indian filter coffee in Nellore — Classic, Strong and Pure filter coffee powder in Nellore, ground for the traditional South Indian filter. Roasted and packed in small batches, it is fresh coffee powder in Nellore for the everyday morning ritual.</p>
+          <p>Daily is our South Indian filter coffee in Nellore — Classic and Strong filter coffee powder in Nellore, ground for the traditional South Indian filter. Roasted and packed in small batches, it is fresh coffee powder in Nellore for the everyday morning ritual.</p>
         </div>
         <div class="reveal">
           <h3>EDEN Reserve — Arabica &amp; Robusta beans</h3>
@@ -875,11 +881,19 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
         <p>Questions about the launch, the coffee, or stocking EDEN at your café? Write to us — a person reads every message.</p>
         <p style="margin-top:18px"><b style="font-family:var(--serif);font-size:20px">EDEN Coffee</b><br/>DNSSS Shopping Complex, Podalakur Road, AK Nagar Post Office,<br/>Nellore, Andhra Pradesh — 524004 · Launching soon</p>
         <p style="margin-top:10px"><a href="https://maps.app.goo.gl/LcVhgjjwDbVJbSxn8" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Find us on Google Maps</a></p>
-        <p style="margin-top:12px">Support (Anand): <a id="supportWa1" href="https://wa.me/252657366648" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Support on WhatsApp</a> or <a id="supportWa2" href="https://wa.me/919059907128" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Chat on WhatsApp</a> — for any support or query, you reach the owner directly.<br/>Local Store — Nellore: <a id="storeWa" href="https://wa.me/919441444715" target="_blank" rel="noopener" style="color:var(--forest);text-decoration:underline">Local Store on WhatsApp</a> · <a id="storeTel" href="tel:+919441444715" style="color:var(--forest);text-decoration:underline">Call the store</a><br/>Email: <a id="supportEmailLink" href="mailto:hello@edencoffee.in" style="color:var(--forest);text-decoration:underline">hello@edencoffee.in</a></p>
+        <p style="margin-top:12px">Support: for any support or query, you reach the owner directly. Local Store — Nellore:</p>
+        <div class="contact-icons">
+          <a id="supportWa1" class="ci" href="https://wa.me/252657366648" target="_blank" rel="noopener" aria-label="Support on WhatsApp" title="Support on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" class="ci-wa"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg><span>Support</span></a>
+          <a id="supportWa2" class="ci" href="https://wa.me/919059907128" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" title="Chat on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" class="ci-wa"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg><span>Chat</span></a>
+          <a id="storeWa" class="ci" href="https://wa.me/919441444715" target="_blank" rel="noopener" aria-label="Local Store on WhatsApp" title="Local Store on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" class="ci-wa"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg><span>Store</span></a>
+          <a id="storeTel" class="ci" href="tel:+919441444715" aria-label="Call the store" title="Call the store"><svg viewBox="0 0 24 24" aria-hidden="true" class="st"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.9z"/></svg><span>Call</span></a>
+          <a id="supportEmailLink" class="ci" href="mailto:hello@edencoffee.in" aria-label="Email EDEN Coffee" title="Email EDEN Coffee"><svg viewBox="0 0 24 24" aria-hidden="true" class="st"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg><span>Email</span></a>
+          <a class="ci" href="https://www.instagram.com/edencoffeeindia/" target="_blank" rel="noopener" aria-label="EDEN Coffee on Instagram" title="EDEN Coffee on Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" class="st"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg><span>Instagram</span></a>
+        </div>
         <p style="margin-top:10px">Launching soon — orders open at brand launch.</p>
       </div>
       <form class="form reveal" id="contactForm">
-        <label>Your name<input required name="name" autocomplete="name" placeholder="e.g. Priya Sharma"/></label>
+        <label>Your name<input required name="name" autocomplete="name" placeholder="Your full name"/></label>
         <label>Email<input required type="email" name="email" autocomplete="email" placeholder="you@example.com"/></label>
         <label>Message<textarea required name="message" placeholder="How can we help?"></textarea></label>
         <div><button class="btn solid" type="submit">Write to Us</button></div>
@@ -920,8 +934,8 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
         <div class="news-row">
           <a class="btn small" href="https://wa.me/252657366648?text=Hello%20EDEN%20Coffee%20%E2%80%94%20please%20add%20me%20to%20the%20launch%20list." target="_blank" rel="noopener" style="border-color:var(--gold);color:var(--gold)">Join on WhatsApp</a>
         </div>
-        <p style="font-size:13px;color:rgba(246,240,229,.55);margin-top:10px">Tap Join to open WhatsApp with a short launch-list message ready to send. Questions? Reach us on <a href="https://wa.me/252657366648" target="_blank" rel="noopener" style="display:inline;padding:0;font-size:inherit;color:var(--gold);text-decoration:underline">Support on WhatsApp</a> or <a href="https://wa.me/919059907128" target="_blank" rel="noopener" style="display:inline;padding:0;font-size:inherit;color:var(--gold);text-decoration:underline">Chat on WhatsApp</a>. Prefer email? Write to <a id="supportEmailLinkFoot" href="mailto:hello@edencoffee.in" style="display:inline;padding:0;font-size:inherit;color:var(--gold);text-decoration:underline">hello@edencoffee.in</a>.</p>
-        <p style="font-size:13px;color:rgba(246,240,229,.55);margin-top:6px">Follow us on <a href="https://www.instagram.com/edencoffeeindia/" target="_blank" rel="noopener" style="display:inline;padding:0;font-size:inherit;color:var(--gold);text-decoration:underline">Instagram — @edencoffeeindia</a></p>
+        <p style="font-size:13px;color:rgba(246,240,229,.55);margin-top:10px">Tap Join to open WhatsApp with a short launch-list message ready to send. Questions? Reach us on <a href="https://wa.me/252657366648" target="_blank" rel="noopener" class="foot-ic" aria-label="Support on WhatsApp" title="Support on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" class="fi-wa"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a> or <a href="https://wa.me/919059907128" target="_blank" rel="noopener" class="foot-ic" aria-label="Chat on WhatsApp" title="Chat on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" class="fi-wa"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>. Prefer email? Write to <a id="supportEmailLinkFoot" href="mailto:hello@edencoffee.in" style="display:inline;padding:0;font-size:inherit;color:var(--gold);text-decoration:underline">hello@edencoffee.in</a>.</p>
+        <p style="font-size:13px;color:rgba(246,240,229,.55);margin-top:6px">Follow us on <a href="https://www.instagram.com/edencoffeeindia/" target="_blank" rel="noopener" class="foot-ic" aria-label="EDEN Coffee on Instagram" title="EDEN Coffee on Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" class="st"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg></a> @edencoffeeindia</p>
       </div>
     </div>
     <p style="font-size:13px;color:rgba(246,240,229,.5);max-width:90ch">FSSAI Lic. No.: [to be added by owner] · Packed by: EDEN Coffee, [packer address to be added by owner]. Coffee-origin photography shows coffee-growing regions of the world and does not by itself claim sourcing for any specific coffee.</p>
@@ -1017,7 +1031,7 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
       <div id="authSignUpView" hidden>
         <p class="auth-subtitle">Create your account — we will email you a verification link to activate it.</p>
         <form class="form" id="regForm" novalidate>
-          <label>Full Name<input id="regName" autocomplete="name" placeholder="e.g. Priya Sharma" required/></label>
+          <label>Full Name<input id="regName" autocomplete="name" placeholder="Your full name" required/></label>
           <label>Mobile Number<span class="cc-row"><select id="regCc" aria-label="Country code"><option value="+91" selected>+91 · India</option><option value="+252">+252 · Somalia</option><option value="+971">+971 · UAE</option><option value="+974">+974 · Qatar</option><option value="+966">+966 · Saudi Arabia</option><option value="+965">+965 · Kuwait</option><option value="+968">+968 · Oman</option><option value="+44">+44 · UK</option><option value="+1">+1 · USA / Canada</option><option value="+61">+61 · Australia</option><option value="+65">+65 · Singapore</option><option value="+60">+60 · Malaysia</option></select><input id="regMobile" inputmode="tel" autocomplete="tel" placeholder="Mobile number" required/></span></label>
           <p class="field-hint" style="margin:0">For delivery updates and order contact — we never verify your account by mobile code.</p>
           <label>Email Address<input type="email" id="regEmail" autocomplete="email" placeholder="you@example.com" required/></label>
@@ -1116,7 +1130,7 @@ footer p{color:rgba(246,240,229,.7);font-size:14.5px}
         <p class="auth-subtitle" id="detailsSubtitle">Just your name and mobile to finish creating your account.</p>
         <form class="form" id="detailsForm" novalidate>
           <label id="dEmailWrap">Email<input type="email" id="dEmail" autocomplete="email" placeholder="you@example.com" readonly style="opacity:.65"/></label>
-          <label>Full Name<input id="dName" autocomplete="name" placeholder="e.g. Priya Sharma" required/></label>
+          <label>Full Name<input id="dName" autocomplete="name" placeholder="Your full name" required/></label>
           <label>Mobile Number<span class="cc-row"><select id="dCc" aria-label="Country code"><option value="+91" selected>+91 · India</option><option value="+252">+252 · Somalia</option><option value="+971">+971 · UAE</option><option value="+974">+974 · Qatar</option><option value="+966">+966 · Saudi Arabia</option><option value="+965">+965 · Kuwait</option><option value="+968">+968 · Oman</option><option value="+44">+44 · UK</option><option value="+1">+1 · USA / Canada</option><option value="+61">+61 · Australia</option><option value="+65">+65 · Singapore</option><option value="+60">+60 · Malaysia</option></select><input id="dMobile" inputmode="tel" autocomplete="tel" placeholder="Mobile number" required/></span></label>
           <p class="field-err" id="detailsErr" role="alert"></p>
           <div><button class="btn solid" type="submit" id="detailsSubmit" style="width:100%;justify-content:center">Save Details &amp; Sign In</button></div>
@@ -1598,29 +1612,29 @@ if(!reduced){
 /* ---------------- shop preview — the card becomes the page (Glide motion) ---------------- */
 const PRODUCTS = [
  {id:"daily-classic", col:"EDEN Daily", name:"Daily Classic", form:"South Indian Filter Coffee Powder", blend:"80% Coffee · 20% Chicory",
-  sizes:["100g","250g","500g","1kg"], prices:[99,199,379,699],
+  sizes:["250g","500g","1kg"], prices:[199,379,699],
   desc:"EDEN's everyday filter coffee — 80% coffee, 20% chicory, ground for the South Indian filter. Balanced and familiar, with the thick decoction that takes milk and a little jaggery the way it should.",
   brew:"Brew it in a traditional South Indian filter: two heaped tablespoons per cup, water just off the boil, ten patient minutes."},
  {id:"daily-strong", col:"EDEN Daily", name:"Daily Strong", form:"South Indian Filter Coffee Powder", blend:"70% Coffee · 30% Chicory",
-  sizes:["100g","250g","500g","1kg"], prices:[89,179,339,629],
+  sizes:["250g","500g","1kg"], prices:[179,339,629],
   desc:"More chicory, more body. A darker, stronger decoction for mornings that need a firmer start — the blend for those who like their filter coffee with backbone.",
   brew:"Brew it in a traditional South Indian filter: two heaped tablespoons per cup, water just off the boil, ten patient minutes."},
- {id:"daily-pure", col:"EDEN Daily", name:"Daily Pure", form:"South Indian Filter Coffee Powder", blend:"100% Coffee · No Chicory",
-  sizes:["100g","250g","500g","1kg"], prices:[129,249,479,899],
-  desc:"Nothing but coffee — no chicory, no shortcuts. A clean, full coffee flavour for purists, ground fine for the filter and just as happy in a moka pot.",
-  brew:"Brew it in a traditional South Indian filter, or a moka pot: two heaped tablespoons per cup, water just off the boil."},
  {id:"reserve-arabica", col:"EDEN Reserve", name:"Reserve Arabica", form:"Whole Beans · Also Ground as Powder", blend:"100% Arabica",
-  sizes:["100g","250g","500g"], prices:[279,599,1149],
+  sizes:["250g","500g"], prices:[599,1149],
   desc:"100% arabica, roasted in small batches and rested before packing. Smooth and aromatic — take it as whole beans for your own grinder, or ground as powder, ready to brew.",
   brew:"Grind just before brewing if you can: 18 g for a 300 ml pour-over, water at about 93°C, slow circles."},
  {id:"reserve-robusta", col:"EDEN Reserve", name:"Reserve Robusta", form:"Whole Beans · Also Ground as Powder", blend:"100% Robusta",
-  sizes:["100g","250g","500g"], prices:[229,499,949],
+  sizes:["250g","500g"], prices:[499,949],
   desc:"100% robusta — bold and full-bodied, with the deep crema robusta is prized for. For espresso drinkers and strong-coffee loyalists who want the cup to push back.",
   brew:"Built for espresso and the moka pot: a fine grind, a firm tamp, and a short, intense extraction."},
  {id:"reserve-premium", col:"EDEN Reserve", name:"Reserve Premium Blend", form:"Whole Beans · Also Ground as Powder", blend:"Arabica · Robusta Blend",
-  sizes:["100g","250g","500g"], prices:[299,649,1249],
+  sizes:["250g","500g"], prices:[649,1249],
   desc:"The roaster's balance — arabica's aroma over robusta's body, blended so neither shouts the other down. In beans for your grinder, or ground as powder, ready to brew.",
-  brew:"Equally at home in a pour-over or a moka pot: 18 g for 300 ml, water just off the boil."}
+  brew:"Equally at home in a pour-over or a moka pot: 18 g for 300 ml, water just off the boil."},
+ {id:"signature-peaberry", col:"EDEN Signature", name:"Signature Peaberry", form:"Whole Beans · Also Ground as Powder", blend:"100% Peaberry",
+  sizes:["250g","500g","1kg"], prices:[749,1449,2799],
+  desc:"100% peaberry — the rare, round single bean from each cherry, roasted in small batches and rested before packing. Richer and more intense than ordinary beans, with a depth that rewards a slow brew. In beans for your grinder, or ground as powder, ready to brew.",
+  brew:"Best in a pour-over or French press: 18 g for 300 ml, water just off the boil, a slow, patient pour."}
 ];
 const pgrid = $("#pgrid");
 function renderShop(filter){
@@ -1715,10 +1729,10 @@ $$("#shopFilters button").forEach(b=> b.addEventListener("click", ()=>{
 const pdOverlay = $("#pdOverlay"), pdPanel = $("#pdPanel"), pdScrim = $("#pdScrim"), pdLayout = pdPanel.querySelector(".pdp-layout");
 let openCard = null, pdAnimating = false, pdSizeIdx = 0, pdCurrent = null;
 
-const GIFT = {id:"luxury-gift-box", kind:"gift", col:"EDEN Coffee · Gifting", name:"Luxury Gift Box", form:"2 × 100g Coffee Packs · Gift Boxed", blend:"Two 100 g packs",
-  sizes:["2 × 100g"], prices:[1099],
-  desc:"Two 100 g packs of EDEN coffee in a luxury gift box — a considered gift for anyone who loves a good cup, and the easy way to introduce someone to EDEN.",
-  brew:"Each pack brews the way its own label describes — filter, pour-over, moka pot or espresso."};
+const GIFT = {id:"luxury-gift-box", kind:"gift", col:"EDEN Coffee · Gifting", name:"Luxury Gift Box", form:"", blend:"",
+  sizes:[], prices:[],
+  desc:"",
+  brew:""};
 const BREWS = ["Espresso","Filter Coffee","Pour Over","Moka Pot"];
 let pdForm = null, pdBrew = null;
 function pdKind(p){ return p.kind || (p.id.indexOf("daily")===0 ? "daily" : "flex"); }
@@ -1736,7 +1750,7 @@ function syncPdAdd(){
   const kind = pdKind(pdCurrent), btn = $("#pdAdd"), shelf = $("#pdShelf");
   if(!ORDERING_OPEN){ btn.disabled = true; btn.textContent = "Launching Soon"; shelf.textContent = "Launching soon — orders open at brand launch. Browse the full range, pick your size, beans or powder and grind to see it all — and join the launch list to be first to order."; return; }
   if(kind==="daily"){ btn.disabled = false; shelf.textContent = "Filter coffee powder — ground for the South Indian filter, the only grind Daily comes in. Shelf life: 9 months."; }
-  else if(kind==="gift"){ btn.disabled = false; shelf.textContent = "Luxury Gift Box — two 100 g packs, ready to gift."; }
+  else if(kind==="gift"){ btn.disabled = true; shelf.textContent = "Luxury Gift Box — details coming soon."; }
   else if(!pdForm){ btn.disabled = true; shelf.textContent = "First choose whole beans or ground powder."; }
   else if(pdForm==="beans"){ btn.disabled = false; shelf.textContent = "Whole beans — straight to your cart, no grind step; grind fresh at home. Shelf life: 6 months."; }
   else if(!pdBrew){ btn.disabled = true; shelf.textContent = "Now choose your brewing method above — your powder is ground for it. Shelf life: 9 months."; }
@@ -1842,9 +1856,10 @@ $("#pdAdd").addEventListener("click", ()=>{
 });
 $("#pdViewCart").addEventListener("click", ()=>{ settleClosed(); openCart(); });
 const giftViewEl = $("#giftView");
-giftViewEl.addEventListener("click", ()=> openProduct(giftViewEl));
-$("#giftAdd").addEventListener("click", ()=> addToCart({pid:GIFT.id, name:GIFT.name, size:GIFT.sizes[0], price:GIFT.prices[0], form:"gift", brew:null}, true));
-if(!ORDERING_OPEN){ const gb = $("#giftAdd"); gb.disabled = true; gb.textContent = "Launching Soon"; }
+if(giftViewEl) giftViewEl.addEventListener("click", ()=> openProduct(giftViewEl));
+var ga = $("#giftAdd");
+if(ga) ga.addEventListener("click", ()=> addToCart({pid:GIFT.id, name:GIFT.name, size:GIFT.sizes[0], price:GIFT.prices[0], form:"gift", brew:null}, true));
+if(!ORDERING_OPEN){ const gb = $("#giftAdd"); if(gb){ gb.disabled = true; gb.textContent = "Launching Soon"; } }
 
 /* ---------------- cart (guests welcome — sign-in only to order) ---------------- */
 let cart = [], shipMode = "standard";
@@ -1893,7 +1908,7 @@ function addToCart(item, announce){
 function cartSubtotal(){ return cart.reduce((s,c)=> s + c.price*c.qty, 0); }
 function shipCost(){ if(!cart.length) return 0; if(shipMode==="express") return 149; return cartSubtotal()>=999 ? 0 : 60; }
 function itemMeta(c){
-  if(c.form==="gift") return "Luxury Gift Box · 2 × 100g";
+  if(c.form==="gift") return "Luxury Gift Box";
   if(c.form==="beans") return c.size + " · Whole Beans";
   return c.size + " · Ground Powder" + (c.brew ? " · " + c.brew : "");
 }
@@ -2502,7 +2517,7 @@ function completeSignIn(){
   pendingFlow = null;
   closeModal("authModal");
   syncAuthUI(); renderCart();
-  showToast("Welcome, " + (profile ? profile.name : "friend") + " \u2014 you are signed in.");
+  showToast("Welcome \u2014 you are signed in.");
   loadOrders().then(()=>{
     if(pendingCheckout){ pendingCheckout = false; saveCart(); openCart(); }
     else if(pendingOrders){ pendingOrders = false; saveCart(); openDashboard(true); }
@@ -2510,7 +2525,15 @@ function completeSignIn(){
 }
 function syncAuthUI(){
   const ab = $("#authBtn");
-  ab.textContent = user ? (profile ? profile.name.split(" ")[0] : "My Dashboard") : "Sign In";
+  const ob = $("#ordersBtn");
+  /* One account button only: signed out it says "Sign In", signed in
+     it says "My Dashboard" and opens the dashboard (see #authBtn
+     handler). #ordersBtn stays hidden in both states so the header
+     never shows Sign In and Dashboard side by side; the mobile menu
+     still reaches the dashboard through #mmOrders -> #ordersBtn.click(),
+     which works while the button is hidden. */
+  ab.textContent = user ? "My Dashboard" : "Sign In";
+  if(ob) ob.style.display = "none";
   /* Auth state is known once this runs — reveal the header button
      (it starts hidden with .auth-pending so a reload never flashes
      "Sign In" at a signed-in customer). */
